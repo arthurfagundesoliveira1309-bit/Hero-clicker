@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR" translate="no">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HERO V17 - SUPERNOVA</title>
+<script type="importmap">{"imports":{"firebase/app":"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js","firebase/database":"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"}}</script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#08080f;color:#fff;font-family:Arial;text-align:center}
+.top{padding:10px;background:#111;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20}
+.coin{font-weight:900;color:#ffde59}.cyber{font-weight:900;color:#a855f7}
+.clickWrap{position:relative;width:220px;height:220px;margin:15px auto;display:flex;align-items:center;justify-content:center}
+.aura{position:absolute;inset:-15px;border-radius:50%;pointer-events:none}
+.aura.cinza{border:3px solid #888;box-shadow:0 0 20px #888}.aura.azul{border:3px solid #00aaff;box-shadow:0 0 35px #00aaff;animation:spin 3s linear infinite}
+.aura.fogo{border:4px solid #ff4400;box-shadow:0 0 40px #ff4400;animation:pulse 0.8s infinite}.aura.gelo{border:4px solid #00ffff;box-shadow:0 0 40px #00ffff;animation:spin 2s linear infinite reverse}
+.aura.void{border:4px solid #a000ff;background:conic-gradient(from 0deg,#a000ff,transparent,#a000ff,transparent);box-shadow:0 0 50px #a000ff;animation:spin 1.2s linear infinite}
+.aura.estelar{border:5px solid gold;background:conic-gradient(from 0deg,gold,#fff,gold);box-shadow:0 0 50px gold;animation:spin 0.9s linear infinite}
+.aura.cosmica{border:5px solid #ff00ff;background:conic-gradient(from 0deg,#ff00ff,#00ffff,#ffff00,#ff00ff);box-shadow:0 0 60px #ff00ff;animation:spin 0.6s linear infinite}
+.aura.cyber{border:5px solid #6d28d9;background:conic-gradient(from 0deg,#1e1b4b,#7c3aed,#06b6d4,#1e1b4b);box-shadow:0 0 60px #7c3aed,0 0 100px #06b6d4;animation:spin 0.5s linear infinite}
+.aura.supernova{border:5px solid #ffaa00;background:conic-gradient(from 0deg,#ffff00,#ff6600,#000000,#ffff00);box-shadow:0 0 60px #ffff00,0 0 100px #ff6600;animation:spin 0.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.clickBtn{width:200px;height:200px;border-radius:50%;background:linear-gradient(#00ff88,#00cc66);border:none;font-weight:900;font-size:28px;color:#000;z-index:2}
+.rankBox{background:#15151f;border:1px solid #333;border-radius:12px;padding:10px;margin:10px;font-size:12px;text-align:left}
+.rank1{color:gold;font-weight:900}.rank2{color:#ccc;font-weight:900}.rank3{color:#cd7f32;font-weight:900}
+#shop{position:fixed;top:0;right:0;width:100%;max-width:380px;height:100%;background:#0f0f19;z-index:100;padding:16px;text-align:left;overflow:auto;transform:translateX(100%);transition:.3s}
+#shop.open{transform:translateX(0)}.tab{display:none}.tab.active{display:block}
+.item{background:#1a1a28;padding:12px;border-radius:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #2a2a40}
+.pet{padding:10px;border-radius:12px;margin-bottom:8px;background:#151525;border:1px solid #333;display:flex;justify-content:space-between;align-items:center}
+.petEmoji{font-size:22px;animation:petFloat 2s ease-in-out infinite;display:inline-block}@keyframes petFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.rarity{font-size:9px;padding:2px 6px;border-radius:6px;font-weight:bold}.common{background:#555}.rare{background:#0077ff}.epic{background:#a000ff}.legendary{background:gold;color:#000}.mythic{background:linear-gradient(45deg,#ff00ff,#00ffff);color:#000}.cyberRarity{background:linear-gradient(45deg,#4c1d95,#06b6d4);color:#fff}.supernovaRarity{background:linear-gradient(45deg,#ffff00,#ff6600);color:#000}
+.nbtn{padding:7px 9px;border-radius:20px;border:1px solid #333;background:#1a1a28;color:#fff;font-weight:bold;font-size:9px;margin:2px}.nbtn.active{background:#00ff88;color:#000}
+#hatchModal,#nameModal{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px}
+#hatchModal.show,#nameModal.show{display:flex}.eggAnim{font-size:90px}.shaking{animation:eggShake 0.12s infinite}.cracking{animation:eggCrack 0.6s forwards}
+@keyframes eggShake{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}@keyframes eggCrack{0%{transform:scale(1)}100%{transform:scale(0);opacity:0}}
+.petReveal{font-size:80px;display:none}.petReveal.show{display:block;animation:revealPop 0.6s forwards}@keyframes revealPop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.boostActive{background:#00ff88;color:#000;padding:8px;border-radius:10px;text-align:center;margin-bottom:10px;font-weight:900;animation:pulse 0.8s infinite}
+.cyberBanner{background:linear-gradient(90deg,#4c1d95,#7c3aed,#06b6d4);padding:10px;border-radius:12px;margin:10px;font-weight:900;animation:pulse 0.8s infinite}
+.supernovaBanner{background:linear-gradient(90deg,#ffff00,#ff6600,#000);padding:10px;border-radius:12px;margin:10px;font-weight:900;animation:pulse 0.6s infinite;color:#fff}
+#adminEventBar{position:fixed;top:0;left:0;width:100%;background:linear-gradient(90deg,#a000ff,#ff00ff);color:#fff;padding:6px;text-align:center;font-weight:900;font-size:12px;display:none;z-index:4000}
+#adminAnnounce{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:linear-gradient(45deg,gold,#ffaa00);color:#000;padding:14px 22px;border-radius:20px;font-weight:900;z-index:6000;display:none;max-width:92%;box-shadow:0 0 30px gold}
+.foodBar{background:#1a1a28;border:1px solid #ffaa00;padding:10px;border-radius:12px;margin:10px 0;display:flex;justify-content:space-between;align-items:center}
+.foodCtrl{display:flex;align-items:center;gap:6px}.ctrlBtn{width:32px;height:32px;border-radius:8px;border:none;background:#333;color:#fff;font-weight:900;font-size:16px}
+.confetti{position:fixed;top:-50px;font-size:30px;animation:fall linear forwards;pointer-events:none;z-index:9999}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="adminEventBar"></div><div id="adminAnnounce"></div>
+<div class="top"><div><b>HERO V17 - SUPERNOVA</b><div style="font-size:9px;opacity:.6" id="connStatus">● Online</div><div id="globalInfo" style="font-size:9px;color:gold"></div></div><div style="text-align:right"><span class="coin" id="coins">0 💰</span><br><span class="cyber" id="cyberPoints">0 🔵</span><div style="font-size:10px;opacity:.5" id="level"></div></div></div>
+<div id="eventBanner" style="display:none"></div>
+<div id="supernovaBanner" style="display:none"></div>
+<div class="rankBox">🏆 <b>RANK GLOBAL</b><div id="rankingList" style="margin-top:6px">Carregando...</div></div>
+<div id="boostBanner" style="margin:10px;display:none"></div>
+<div class="clickWrap"><div id="auraEl" class="aura"></div><button class="clickBtn" id="clickBtn">CLICAR<br><small id="perClick">1 💰</small><br><small id="eventProgress" style="font-size:9px"></small><br><small id="cursorInfo" style="font-size:9px;color:#00ff88"></small></button></div>
+<div style="padding:10px">
+<button onclick="shop.classList.add('open')" style="width:100%;padding:14px;background:#1a1a28;border:1px solid #333;color:#fff;border-radius:12px;font-weight:bold">LOJA 🛒 - <span id="petCount">0 PETS</span></button>
+<div id="myPetsShort" style="margin-top:8px;text-align:left;font-size:12px;background:#111;padding:8px;border-radius:8px"></div>
+<div style="font-size:10px;opacity:.4;margin-top:6px">Cliques: <span id="totalClicks">0</span></div>
+<button onclick="resetSave()" style="margin-top:10px;padding:6px 10px;background:#222;color:#fff;border:none;border-radius:8px;font-size:10px">ZERAR SAVE</button>
+</div>
+<div id="hatchModal"><div id="eggDisplay" class="eggAnim">🥚</div><div id="petReveal" class="petReveal"></div><div id="hatchText" style="margin-top:16px;font-weight:900;font-size:20px"></div><div id="hatchRarity" style="margin-top:10px"></div><button id="btnContinue" onclick="closeHatch()" style="display:none;margin-top:16px;padding:14px 28px;background:#00ff88;color:#000;border:none;border-radius:20px;font-weight:900">CONTINUAR ➜</button><button id="btnCollect" onclick="closeHatch()" style="display:none;margin-top:16px;padding:14px 28px;background:#fff;color:#000;border:none;border-radius:20px;font-weight:900">COLETAR!</button></div>
+<div id="nameModal"><h2>🏆 TOP 3!</h2><p style="font-size:12px">Você entrou no Rank!</p><input id="playerName" placeholder="Seu nome" maxlength="12" style="padding:12px;border-radius:10px;border:none;width:200px;text-align:center;font-weight:bold;font-size:16px"><div style="margin-top:12px;display:flex;gap:10px"><button onclick="saveGlobalRanking(false)" style="padding:12px 20px;background:#00ff88;color:#000;border:none;border-radius:12px;font-weight:900">SALVAR</button><button onclick="$('nameModal').classList.remove('show')" style="padding:12px 20px;background:#333;color:#fff;border:none;border-radius:12px">FECHAR</button></div></div>
+<div id="shop">
+<div style="display:flex;justify-content:space-between"><h3>LOJA</h3><button onclick="shop.classList.remove('open')" style="background:#222;color:#fff;border:none;padding:8px 12px;border-radius:10px">X</button></div>
+<div style="margin-bottom:10px">
+<button class="nbtn active" id="tabBtnAura" onclick="openTab('aura')">AURAS</button>
+<button class="nbtn" id="tabBtnPets" onclick="openTab('pets')">PETS</button>
+<button class="nbtn" id="tabBtnCursor" onclick="openTab('cursor')">CURSOR 🖱️</button>
+<button class="nbtn" id="tabBtnHelpers" onclick="openTab('helpers')">BOOSTS</button>
+<button class="nbtn" id="tabBtnSell" onclick="openTab('sell')">VENDAS</button>
+<button class="nbtn" id="tabBtnCyber" onclick="openTab('cyber')">CYBER 🔵</button>
+<button class="nbtn" id="tabBtnRank" onclick="openTab('rank')">RANK</button>
+</div>
+<div id="tabAura" class="tab active"></div><div id="tabPets" class="tab"></div><div id="tabCursor" class="tab"></div><div id="tabHelpers" class="tab"></div><div id="tabSell" class="tab"></div><div id="tabCyber" class="tab"></div><div id="tabRank" class="tab"></div>
+</div>
+<script type="module">
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } from "firebase/database";
+const firebaseConfig = { apiKey: "AIzaSyDyVYV_7qchf5Gq-zXPac1PbPZj3sct1Ko", authDomain: "hero-clicker-53e1c.firebaseapp.com", databaseURL: "https://hero-clicker-53e1c-default-rtdb.firebaseio.com", projectId: "hero-clicker-53e1c", storageBucket: "hero-clicker-53e1c.firebasestorage.app", messagingSenderId: "38226266560", appId: "1:38226266560:web:9351f0b04b78c156002025" };
+let db, rankingRef; let firebaseReady=false;
+try{ const app=initializeApp(firebaseConfig); db=getDatabase(app); rankingRef=ref(db,'ranking'); firebaseReady=true; document.getElementById('connStatus').innerHTML='● Online'; document.getElementById('connStatus').style.color='#00ff88';
+  const eventRef = ref(db,'global/event'); const annRef = ref(db,'global/announcement'); const updateRef = ref(db,'global/update'); const coinRef = ref(db,'global/coinGift'); const wipeRef = ref(db,'global/forceWipe');
+  const partyRef = ref(db,'global/updateParty'); const supernovaRef = ref(db,'global/supernova');
+  onValue(eventRef,(snap)=>{ const ev=snap.val(); if(!ev) return; window.handleAdminEvent(ev); });
+  onValue(annRef,(snap)=>{ const a=snap.val(); if(!a) return; window.handleAdminAnnounce(a); });
+  onValue(coinRef,(snap)=>{ const g=snap.val(); if(!g) return; window.handleCoinGift(g); });
+  onValue(partyRef,(snap)=>{ const p=snap.val(); if(!p) return; window.handleUpdateParty(p); });
+  onValue(supernovaRef,(snap)=>{ const s=snap.val(); if(!s) return; window.handleSupernova(s); });
+  onValue(updateRef,(snap)=>{ const u=snap.val(); if(!u) return; if(Date.now() - u.version < 10000){ if(confirm(`🔄 ATUALIZAÇÃO do dono ${u.by}! Recarregar?`)) location.reload(); } });
+  onValue(wipeRef,(snap)=>{
+    const w=snap.val(); if(!w) return;
+    let lastWipe=parseInt(localStorage.getItem('HERO_LAST_WIPE')||'0');
+    if(w.version>lastWipe){
+      localStorage.setItem('HERO_LAST_WIPE', w.version);
+      alert(`☠️ ${w.byName||w.by} zerou o save de todo mundo!`);
+      localStorage.removeItem('HERO_V17'); location.reload();
+    }
+  });
+}catch(e){ document.getElementById('connStatus').innerHTML='● Offline'; }
+window.firebaseReady=firebaseReady; window.rankingRef=rankingRef; window.firebaseOps={push,onValue,query,orderByChild,limitToLast,ref};
+if(firebaseReady){
+  const q=query(rankingRef,orderByChild('coins'),limitToLast(30));
+  onValue(q,(snap)=>{
+    const data=snap.val(); if(!data){ document.getElementById('rankingList').innerHTML='<small>Sem recorde</small>'; return; }
+    let list=Object.values(data).sort((a,b)=>(b.coins||0)-(a.coins||0)); let unique=[]; let seen=new Set();
+    for(let p of list){ if(!seen.has(p.name)){ seen.add(p.name); unique.push(p); } if(unique.length>=3) break; } list=unique;
+    let html=''; list.forEach((p,i)=>{ let cls=i==0?'rank1':i==1?'rank2':'rank3'; let medal=i==0?'🥇':i==1?'🥈':'🥉'; html+=`<div class="${cls}">${medal} ${i+1}º ${p.name} - ${(p.coins||0).toLocaleString()} 💰</div>`; });
+    document.getElementById('rankingList').innerHTML=html; window.globalTop3=list;
+    if(document.getElementById('rankingListTab')) document.getElementById('rankingListTab').innerHTML=html;
+  });
+}
+</script>
+<script>
+let audioCtx; function initA(){ if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }
+function pop(){initA();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=750;g.gain.setValueAtTime(0.15,audioCtx.currentTime);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.08);}
+function buySound(){initA();[0,0.1].forEach(d=>{let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=500+d*600;g.gain.setValueAtTime(0.3,audioCtx.currentTime+d);o.connect(g);g.connect(audioCtx.destination);o.start(audioCtx.currentTime+d);o.stop(audioCtx.currentTime+d+0.15);});}
+function crackSound(){initA();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=180;o.type='square';g.gain.setValueAtTime(0.5,audioCtx.currentTime);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.3);}
+let coins=0,aura='none',ownedAuras=['none'],pets=[],equippedPet=null,totalClicks=0,playerNameLocal=localStorage.getItem('HERO_NAME')||'';
+let activeBoost=null, boostTimer=0, boostInterval=null, cooldowns={energetico:0,furia:0,god:0};
+let cyberPoints=0, eventClicks=0, isCyberEvent=false, eventProgress=0;
+let bestGlobalSaved=parseInt(localStorage.getItem('HERO_BEST_GLOBAL')||'0');
+let adminMult=1, adminEventName='', adminEndTime=0, adminTimer=null, lastCoinTime=0, lastPartyTime=0, lastSupernovaTime=0;
+let cursorLevel=0; let foodAmount=0.5; let supernovaActive=false, supernovaEnd=0, supernovaTimer=null;
+const $=id=>document.getElementById(id);
+const AURAS=[{id:'none',name:'Sem Aura',mult:1,price:0,effect:'none'},{id:'cinza',name:'Aura Cinza',mult:2,price:2000,effect:'cinza'},{id:'azul',name:'Aura Azul',mult:4,price:15000,effect:'azul'},{id:'fogo',name:'Aura Fogo',mult:8,price:80000,effect:'fogo'},{id:'gelo',name:'Aura Gelo',mult:15,price:350000,effect:'gelo'},{id:'void',name:'Aura Void',mult:30,price:1500000,effect:'void'},{id:'estelar',name:'Aura Estelar',mult:70,price:5000000,effect:'estelar'},{id:'cosmica',name:'Aura Cósmica',mult:150,price:20000000,effect:'cosmica'},{id:'cyber',name:'Aura Cyber',mult:300,price:0,effect:'cyber',cyberPrice:170,isCyber:true},{id:'supernova',name:'Aura Supernova ☀️',mult:300,price:1000000000000,effect:'supernova',isSupernova:true}];
+const HELPERS=[{id:'energetico', name:'⚡ Energético', price:250, mult:2, time:15, cd:30, desc:'2x por 15s'},{id:'furia', name:'🔥 Fúria', price:1000, mult:5, time:12, cd:120, desc:'5x por 12s'},{id:'god', name:'🌟 God Mode', price:5000, mult:10, time:10, cd:360, desc:'10x por 10s'}];
+const CURSORS=[{level:1,name:'🖱️ Cursor Lv1',cps:1,price:3000},{level:2,name:'🖱️ Cursor Lv2',cps:2,price:50000},{level:3,name:'🖱️ Cursor Lv3',cps:4,price:300000},{level:4,name:'🖱️ Cursor Lv4',cps:6,price:1000000},{level:5,name:'🖱️ Cursor Lv5',cps:8,price:20000000},{level:6,name:'🖱️ Cursor Lv6',cps:10,price:900000000},{level:7,name:'🖱️ Cursor Lv7',cps:12,price:1500000000},{level:8,name:'🖱️ Cursor Lv8',cps:15,price:10000000000},{level:9,name:'🖱️ Cursor Lv9',cps:30,price:300000000000},{level:10,name:'🖱️ Cursor Lv10',cps:45,price:950000000000}];
+const PETS_POOL=[{name:'Gato',rarity:'common',base:1.2,value:100,emoji:'🐱'},{name:'Cachorro',rarity:'common',base:1.3,value:150,emoji:'🐶'},{name:'Coelho',rarity:'rare',base:1.8,value:600,emoji:'🐰'},{name:'Raposa',rarity:'rare',base:2.2,value:900,emoji:'🦊'},{name:'Dragão Baby',rarity:'epic',base:3.5,value:4000,emoji:'🐲'},{name:'Fênix',rarity:'epic',base:5,value:7000,emoji:'🔥🦅'},{name:'Unicórnio',rarity:'legendary',base:9,value:25000,emoji:'🦄'},{name:'Void Pet',rarity:'mythic',base:18,value:120000,emoji:'👁️'}];
+const CYBER_PETS=[{name:'Dragão',rarity:'epic',base:7,value:5000,emoji:'🐲',chance:50},{name:'Serpente Cyber',rarity:'legendary',base:15,value:20000,emoji:'🐍',chance:45},{name:'Dragão Cósmico',rarity:'mythic',base:30,value:150000,emoji:'🌌🐉',isCustom:true,chance:5}];
+const SUPERNOVA_PETS=[{name:'Escorpião',rarity:'epic',base:15,value:50000000000,emoji:'🦂',chance:90},{name:'Sol Pet',rarity:'legendary',base:20,value:100000000000,emoji:'☀️',chance:9.9},{name:'Fênix',rarity:'mythic',base:60,value:500000000000,emoji:'🐦‍🔥',chance:0.1}];
+const EGGS=[{id:'basic',name:'🥚 Ovo Básico',price:500,pool:['common','rare'],list:'🐱 40% 🐶 35% 🐰 15% 🦊 10%'},{id:'epic',name:'💜 Ovo Épico',price:40000,pool:['rare','epic','legendary'],list:'🐰 🦊 🐲 Fênix 🦄 10%'},{id:'mythic',name:'🌟 Ovo Mítico',price:600000,pool:['epic','legendary','mythic'],list:'🐲 Fênix 🦄 👁️ 8%'}];
+window.handleAdminEvent=function(ev){
+  if(!ev || ev.mult==1 || ev.name=='PARADO' || ev.name=='Nenhum'){
+    if(!supernovaActive){adminMult=1; adminEventName=''; $('adminEventBar').style.display='none'; $('globalInfo').innerText=''; if(adminTimer) clearInterval(adminTimer);}
+    render(); return;
+  }
+  adminMult=ev.mult||1; adminEventName=ev.name||'EVENTO'; adminEndTime=(ev.startedAt||Date.now())+(ev.duration||60)*1000;
+  let by=ev.byName||ev.by||'ADMIN'; $('adminEventBar').style.display='block'; $('globalInfo').innerText=`🌐 ${adminEventName} x${adminMult} por ${by}`;
+  if(adminTimer) clearInterval(adminTimer);
+  adminTimer=setInterval(()=>{ let left=Math.max(0,Math.floor((adminEndTime-Date.now())/1000)); $('adminEventBar').innerText=`⚡ ${adminEventName} x${adminMult} | ${left}s | por ${by}`; if(left<=0){ clearInterval(adminTimer); if(!supernovaActive){$('adminEventBar').style.display='none'; adminMult=1; $('globalInfo').innerText='';} render(); } render(); },1000); render();
+};
+window.handleAdminAnnounce=function(a){ if(!a||!a.text) return; let b=$('adminAnnounce'); b.innerText=`👑 ${a.byName||a.by}: ${a.text}`; b.style.display='block'; setTimeout(()=>b.style.display='none',5000); };
+window.handleCoinGift=function(g){ if(!g||!g.amount||g.amount<=0) return; if(Date.now() - (g.startedAt||0) > 12000) return; if(g.startedAt===lastCoinTime) return; lastCoinTime=g.startedAt; coins+=g.amount; buySound(); let b=$('adminAnnounce'); b.innerText=`💰 CHUVA! +${g.amount.toLocaleString()} moedas de ${g.byName||g.by}!`; b.style.display='block'; setTimeout(()=>b.style.display='none',5000); save(); render(); };
+window.handleUpdateParty=function(p){
+  if(!p||!p.startedAt) return; if(p.startedAt===lastPartyTime) return; lastPartyTime=p.startedAt;
+  if(Date.now() - p.startedAt > p.duration*1000) return;
+  for(let i=0;i<30;i++){
+    setTimeout(()=>{
+      let e=document.createElement('div'); e.className='confetti';
+      e.innerText=['🥳','🎊','🎉'][Math.floor(Math.random()*3)];
+      e.style.left=Math.random()*100+'vw'; e.style.animationDuration=(2+Math.random()*3)+'s'; e.style.fontSize=(20+Math.random()*20)+'px';
+      document.body.appendChild(e); setTimeout(()=>e.remove(),5000);
+    }, i*120);
+  }
+  let b=$('adminAnnounce'); b.innerText=`🎉 UPDATE DE DOMINGO ATIVO! 🥳🎊🎉`; b.style.display='block'; setTimeout(()=>b.style.display='none',5000);
+};
+window.handleSupernova=function(s){
+  if(!s) return; if(s.startedAt===lastSupernovaTime &&!s.active) return;
+  if(s.active && Date.now() - s.startedAt < s.duration*1000){
+    lastSupernovaTime=s.startedAt; supernovaActive=true; supernovaEnd=s.startedAt+s.duration*1000;
+    $('supernovaBanner').style.display='block'; $('supernovaBanner').innerHTML=`<div class="supernovaBanner">☀️ SUPERNOVA ATIVA! Ovo 300B + Aura 1T por tempo limitado!</div>`;
+    if(supernovaTimer) clearInterval(supernovaTimer);
+    supernovaTimer=setInterval(()=>{
+      let left=Math.max(0,Math.floor((supernovaEnd-Date.now())/1000));
+      $('supernovaBanner').innerHTML=`<div class="supernovaBanner">☀️ SUPERNOVA x300 | ${left}s restantes | OVO 300B NA LOJA!</div>`;
+      if(left<=0){ clearInterval(supernovaTimer); supernovaActive=false; $('supernovaBanner').style.display='none'; render(); }
+    },1000);
+  } else {
+    supernovaActive=false; $('supernovaBanner').style.display='none'; if(supernovaTimer) clearInterval(supernovaTimer);
+  }
+  render();
+};
+function save(){localStorage.setItem('HERO_V17',JSON.stringify({coins,aura,ownedAuras,pets,equippedPet,totalClicks,playerNameLocal,cooldowns,cyberPoints,eventClicks,cursorLevel,foodAmount}));}
+function load(){
+  ['HERO_V15','HERO_V14','HERO_V13','HERO_V16','HERO_V16_1','HERO_V16_2'].forEach(k=>localStorage.removeItem(k));
+  let d=localStorage.getItem('HERO_V17'); if(d){try{let j=JSON.parse(d);coins=j.coins||0;aura=j.aura||'none';ownedAuras=j.ownedAuras||['none'];pets=j.pets||[];equippedPet=j.equippedPet||null;totalClicks=j.totalClicks||0;playerNameLocal=j.playerNameLocal||localStorage.getItem('HERO_NAME')||'';cooldowns=j.cooldowns||{energetico:0,furia:0,god:0};cyberPoints=j.cyberPoints||0;eventClicks=j.eventClicks||0;cursorLevel=j.cursorLevel||0;foodAmount=j.foodAmount||0.5;}catch(e){}}
+}
+load();
+function getTotalMult(){ let base=(AURAS.find(a=>a.id==aura)?.mult||1)*(pets.find(p=>p.id==equippedPet)?.mult||1); if(activeBoost) base*=activeBoost.mult; base*=adminMult; return base; }
+function getCursorCPS(){ if(cursorLevel==0) return 0; return CURSORS.find(c=>c.level==cursorLevel)?.cps||0; }
+function checkCyberEvent(){ let now=new Date(); let day=now.getDay(); let hour=now.getHours(); let minute=now.getMinutes(); if(day===4 && (hour>6 || (hour===6 && minute>=30))){ isCyberEvent=true; } else { isCyberEvent=false; } window.isCyberEvent=isCyberEvent; let banner=$('eventBanner'); if(isCyberEvent){ banner.style.display='block'; banner.innerHTML=`<div class="cyberBanner">🔵 EVENTO CYBER ATIVO! • ${eventProgress}/100 cliques = 1 Ponto</div>`; } else { banner.style.display='none'; } }
+setInterval(checkCyberEvent, 60000); checkCyberEvent();
+function render(){
+ let total=getTotalMult(); let cps=getCursorCPS();
+ $('coins').innerText=coins.toLocaleString()+' 💰'; $('cyberPoints').innerText=cyberPoints+' 🔵 CYBER';
+ $('level').innerText='x'+total.toFixed(1)+' • '+pets.length+' PETS'+(cps>0?' • 🖱️ '+cps+'/s':'')+(adminMult>1?' • 🌐 '+adminEventName+' x'+adminMult:'');
+ $('perClick').innerText=total.toFixed(1)+' 💰'; $('eventProgress').innerText=isCyberEvent?`🔵 ${eventProgress}/100`:''; $('petCount').innerText=pets.length+' PETS'; $('totalClicks').innerText=totalClicks.toLocaleString(); $('auraEl').className='aura '+(AURAS.find(a=>a.id==aura)?.effect||''); $('cursorInfo').innerText=cps>0?`🖱️ ${cps} cliques/s`:'';
+ if(activeBoost){ $('boostBanner').style.display='block'; $('boostBanner').innerHTML=`<div class="boostActive">⚡ ${activeBoost.name.toUpperCase()} x${activeBoost.mult} - ${boostTimer}s</div>`; } else { $('boostBanner').style.display='none'; }
+ let htmlAura=''; AURAS.forEach(a=>{
+   if(a.isCyber &&!a.isSupernova){} else if(a.isSupernova &&!supernovaActive &&!ownedAuras.includes('supernova')) return;
+   let owned=ownedAuras.includes(a.id);
+   let priceText = a.isCyber? `${a.cyberPrice} 🔵` : a.isSupernova? `1 TRILHÃO 💰` : `${a.price.toLocaleString()} 💰`;
+   let canBuy = a.isCyber? cyberPoints>=a.cyberPrice : a.isSupernova? coins>=1000000000000 : coins>=a.price;
+   htmlAura+=`<div class="item" style="${a.isSupernova?'border:2px solid #ffaa00;background:#1a1200':''}"><div><b>${a.name} x${a.mult}</b><br><small style="${canBuy?'color:#00ff88':''}">${priceText}</small></div><button onclick="buyAura('${a.id}')" style="padding:8px 12px;border-radius:10px;border:none;font-weight:bold;background:${aura==a.id?'#00ff88':owned?'#333':'#fff'}">${aura==a.id?'EQUIPADA':owned?'EQUIPAR':'COMPRAR'}</button></div>`;
+ }); $('tabAura').innerHTML=htmlAura;
+ let htmlCursor='<h4>🖱️ CURSORES</h4><div style="background:#111;padding:8px;border-radius:8px;margin-bottom:10px;font-size:11px">Seu cursor: <b>Lv'+cursorLevel+' • '+cps+' cliques/s</b></div>';
+ CURSORS.forEach(c=>{ let isNext=c.level==cursorLevel+1; let isOwned=c.level<=cursorLevel; let canBuy=isNext && coins>=c.price; htmlCursor+=`<div class="item" style="${isNext?'border-color:#00ff88':''}"><div><b>${c.name} ${c.cps}x/s</b><br><small>${c.price.toLocaleString()} 💰</small></div><button onclick="buyCursor(${c.level})" style="padding:8px 12px;border-radius:10px;border:none;font-weight:bold;background:${isOwned?'#333':canBuy?'#00ff88':'#222'};color:${isOwned?'#888':canBuy?'#000':'#555'}" ${isOwned||!isNext?'disabled':''}>${isOwned?'COMPRADO':isNext?(canBuy?'COMPRAR':'SEM GRANA'):'🔒'}</button></div>`; }); $('tabCursor').innerHTML=htmlCursor;
+ let foodPrice = Math.floor(foodAmount*3000);
+ let htmlP='';
+ if(supernovaActive){
+   htmlP+=`<div class="item" style="border:2px solid #ffaa00;background:linear-gradient(90deg,#1a1200,#331a00);flex-direction:column;align-items:flex-start"><div style="width:100%;display:flex;justify-content:space-between"><div><b>☀️ OVO SUPERNOVA - 300 BILHÕES</b><br><small>🦂 90% x15 | ☀️ 9.9% x20 | 🐦‍🔥 0.1% x60</small><br><small style="${coins>=300000000000?'color:#00ff88':'color:#ff4444'}">300,000,000,000 💰</small></div><button onclick="buySupernovaEgg()" style="padding:8px 12px;border-radius:10px;background:linear-gradient(90deg,#ffff00,#ff6600);font-weight:bold;color:#000">CHOCAR 300B</button></div></div>`;
+ }
+ EGGS.forEach(egg=>{htmlP+=`<div class="item" style="flex-direction:column;align-items:flex-start"><div style="width:100%;display:flex;justify-content:space-between"><div><b>${egg.name}</b><br><small style="${coins>=egg.price?'color:#00ff88':''}">${egg.price.toLocaleString()} 💰 • ${egg.list}</small></div><button onclick="buyEgg('${egg.id}')" style="padding:8px 12px;border-radius:10px;background:${egg.id=='basic'?'#fff':egg.id=='epic'?'#a000ff':'gold'};font-weight:bold">CHOCAR</button></div></div>`;});
+ htmlP+=`<div class="foodBar"><div><b>🍖 Carne</b><br><small>+${foodAmount.toFixed(1)} no pet • ${foodPrice.toLocaleString()} 💰</small></div><div class="foodCtrl"><button class="ctrlBtn" onclick="changeFood(-0.5)">-</button><span style="min-width:40px;text-align:center;font-weight:900">${foodAmount.toFixed(1)}</span><button class="ctrlBtn" onclick="changeFood(0.5)">+</button></div></div>`;
+ htmlP+=`<h4>📦 Meus PETS (${pets.length})</h4>`; if(pets.length==0) htmlP+='<small>Sem PETS</small>'; else pets.slice().reverse().forEach(p=>{ htmlP+=`<div class="pet" style="${equippedPet==p.id?'border-color:#00ff88':''}"><div><span class="petEmoji">${p.emoji}</span> <b>${p.name}</b> <span class="rarity ${p.rarity}">${p.rarity}</span><br><small>x${p.mult.toFixed(1)}</small></div><div style="display:flex;flex-direction:column;gap:4px"><button onclick="equipPet('${p.id}')" style="padding:5px 8px;border-radius:8px;background:${equippedPet==p.id?'#00ff88':'#333'};color:${equippedPet==p.id?'#000':'#fff'};border:none;font-size:10px">${equippedPet==p.id?'EQUIPADO':'EQUIPAR'}</button><button onclick="feedPet('${p.id}')" style="padding:5px 8px;border-radius:8px;background:#ffaa00;color:#000;border:none;font-size:10px;font-weight:bold">🍖 ALIMENTAR ${foodAmount.toFixed(1)}</button></div></div>`; }); $('tabPets').innerHTML=htmlP;
+ let now=Date.now()/1000; let htmlHelp=`<h4>⚡ Boosts</h4>`; HELPERS.forEach(h=>{ let cdLeft = Math.max(0, Math.floor((cooldowns[h.id]||0) - now)); let canUse = cdLeft==0 &&!activeBoost; let label = activeBoost? 'EM USO' : cdLeft>0? `${cdLeft}s` : `ATIVAR - ${h.price} 💰`; htmlHelp+=`<div class="item"><div><b>${h.name}</b> - x${h.mult}<br><small>${h.desc}</small></div><button onclick="buyHelper('${h.id}')" style="padding:8px 12px;border-radius:10px;background:${canUse?'#ffde59':'#333'};color:${canUse?'#000':'#888'};border:none;font-weight:bold" ${canUse?'':'disabled'}>${label}</button></div>`; }); $('tabHelpers').innerHTML=htmlHelp;
+ let htmlSell=`<h4>💰 Vender PETS</h4>`; if(pets.length==0) htmlSell+='<small>Sem PETS</small>'; else pets.slice().reverse().forEach(p=>{ let sellVal=Math.floor(p.sellValue * p.mult); htmlSell+=`<div class="item"><div><b>${p.emoji} ${p.name}</b> <span class="rarity ${p.rarity}">${p.rarity}</span><br><small>x${p.mult.toFixed(1)} • ${sellVal.toLocaleString()} 💰</small></div><button onclick="sellPet('${p.id}')" style="padding:8px 12px;border-radius:10px;background:#ff4444;color:#fff;border:none;font-weight:bold">VENDER</button></div>`; }); $('tabSell').innerHTML=htmlSell;
+ let htmlCyber=`<h4>🔵 LOJA CYBER</h4><div style="background:#1a1033;padding:8px;border-radius:8px;margin-bottom:10px;font-size:11px">Você tem: <b>${cyberPoints} 🔵</b></div>`; htmlCyber+=`<div class="item" style="border:2px solid #7c3aed"><div><b>👾 Aura Cyber x300</b><br><small>170 🔵</small></div><button onclick="buyCyberAura()" style="padding:8px 12px;border-radius:10px;background:${ownedAuras.includes('cyber')?'#333':cyberPoints>=170?'#7c3aed':'#222'};color:#fff;border:none;font-weight:bold">${ownedAuras.includes('cyber')?(aura=='cyber'?'EQUIPADA':'EQUIPAR'):cyberPoints>=170?'COMPRAR':'170 🔵'}</button></div>`; htmlCyber+=`<div class="item" style="border:2px solid #06b6d4;flex-direction:column;align-items:flex-start"><div style="width:100%;display:flex;justify-content:space-between"><div><b>🥚 Cyber Egg</b><br><small>50 🔵 • 🐲 50% 🐍 45% 🌌🐉 5%</small></div><button onclick="buyCyberEgg()" style="padding:8px 12px;border-radius:10px;background:${cyberPoints>=50?'#06b6d4':'#222'};color:#000;font-weight:bold">CHOCAR 50 🔵</button></div></div>`; $('tabCyber').innerHTML=htmlCyber;
+ $('myPetsShort').innerHTML=`<span>📦 ${pets.length} PETS | 🖱️ Lv${cursorLevel} ${cps}x/s | 🔵 ${cyberPoints} | x${getTotalMult().toFixed(1)} ${adminMult>1?'| 🌐 '+adminEventName+' x'+adminMult:''}${supernovaActive?' | ☀️ SUPERNOVA':''}</span>`;
+ $('tabRank').innerHTML='<h4>🏆 RANK GLOBAL</h4><div id="rankingListTab" style="margin-top:10px"></div>'; save();
+}
+function openTab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.nbtn').forEach(e=>e.classList.remove('active'));$('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');document.getElementById('tabBtn'+t.charAt(0).toUpperCase()+t.slice(1))?.classList.add('active');}
+function buyAura(id){let a=AURAS.find(x=>x.id==id);if(a.isCyber &&!ownedAuras.includes(id) && cyberPoints < a.cyberPrice){alert('Precisa '+a.cyberPrice+' 🔵'); return;} if(a.isSupernova &&!ownedAuras.includes(id) && coins < 1000000000000){alert('Precisa 1 TRILHÃO!'); return;} if(ownedAuras.includes(id)){aura=id;buySound();render();return;} if(a.isCyber){ cyberPoints-=a.cyberPrice; ownedAuras.push(id); aura=id; buySound(); render(); return; } if(a.isSupernova){ coins-=1000000000000; ownedAuras.push(id); aura=id; buySound(); render(); return; } if(coins<a.price){alert('Sem grana!');return;}coins-=a.price;ownedAuras.push(id);aura=id;buySound();render();}
+function buyCyberAura(){ if(ownedAuras.includes('cyber')){ aura='cyber'; buySound(); render(); return; } if(cyberPoints<170){ alert('Precisa 170 pontos 🔵'); return; } cyberPoints-=170; ownedAuras.push('cyber'); aura='cyber'; buySound(); render(); }
+function buyCursor(lv){ if(lv!=cursorLevel+1){alert('Compra em ordem!');return;} let c=CURSORS.find(x=>x.level==lv); if(coins<c.price){alert('Precisa '+c.price.toLocaleString());return;} coins-=c.price; cursorLevel=lv; buySound(); render(); }
+function changeFood(delta){ foodAmount+=delta; if(foodAmount<0.5) foodAmount=0.5; if(foodAmount>20) foodAmount=20; render(); }
+function buyEgg(type){ let egg=EGGS.find(e=>e.id==type);if(coins<egg.price){alert('Precisa '+egg.price.toLocaleString());return;} coins-=egg.price;let pool=PETS_POOL.filter(p=>egg.pool.includes(p.rarity));let chosen=pool[Math.floor(Math.random()*pool.length)]; if(type=='basic'){let r=Math.random();if(r<0.4) chosen=PETS_POOL[0];else if(r<0.75) chosen=PETS_POOL[1];else if(r<0.90) chosen=PETS_POOL[2];else chosen=PETS_POOL[3];} if(type=='epic'&&Math.random()<0.10) chosen=PETS_POOL.find(p=>p.rarity=='legendary'); if(type=='mythic'&&Math.random()<0.08) chosen=PETS_POOL.find(p=>p.rarity=='mythic'); let newPet={id:'pet_'+Date.now()+Math.random(),name:chosen.name,rarity:chosen.rarity,emoji:chosen.emoji,base:chosen.base,mult:chosen.base,level:1,sellValue:chosen.value}; pets.push(newPet);if(!equippedPet) equippedPet=newPet.id;render();startHatchAnimation(newPet,type); }
+function buySupernovaEgg(){
+  if(!supernovaActive){alert('Evento Supernova não ativo!');return;}
+  if(coins<300000000000){alert('Precisa 300 BILHÕES!');return;}
+  coins-=300000000000;
+  let r=Math.random()*100; let chosen;
+  if(r<90) chosen=SUPERNOVA_PETS[0];
+  else if(r<99.9) chosen=SUPERNOVA_PETS[1];
+  else chosen=SUPERNOVA_PETS[2];
+  let newPet={id:'pet_'+Date.now()+Math.random(),name:chosen.name,rarity:chosen.rarity,emoji:chosen.emoji,base:chosen.base,mult:chosen.base,level:1,sellValue:chosen.value,isSupernova:true};
+  pets.push(newPet); if(!equippedPet) equippedPet=newPet.id; render(); startHatchAnimation(newPet,'supernova');
+}
+function buyCyberEgg(){ if(cyberPoints<50){alert('Precisa 50 🔵');return;} cyberPoints-=50; let r=Math.random()*100; let chosen; if(r<50) chosen=CYBER_PETS[0]; else if(r<95) chosen=CYBER_PETS[1]; else chosen=CYBER_PETS[2]; let newPet={id:'pet_'+Date.now()+Math.random(),name:chosen.name,rarity:chosen.rarity,emoji:chosen.emoji,base:chosen.base,mult:chosen.base,level:1,sellValue:chosen.value,isCyber:true}; pets.push(newPet);if(!equippedPet) equippedPet=newPet.id;render();startHatchAnimation(newPet,'cyber'); }
+function startHatchAnimation(pet,eggType){ let modal=$('hatchModal'),eggEl=$('eggDisplay'),petEl=$('petReveal'),txt=$('hatchText'),rar=$('hatchRarity'),btnCont=$('btnContinue'),btnColl=$('btnCollect'); modal.classList.add('show');eggEl.style.display='block';eggEl.className='eggAnim shaking';eggEl.innerText=eggType=='basic'?'🥚':eggType=='epic'?'💜':eggType=='mythic'?'🌟':eggType=='cyber'?'🔵':eggType=='supernova'?'☀️':'🥚'; petEl.classList.remove('show');petEl.style.display='none';txt.innerText='Chocando...';rar.innerHTML='';btnCont.style.display='none';btnColl.style.display='none';initA(); setTimeout(()=>{eggEl.classList.remove('shaking');eggEl.classList.add('cracking');crackSound();btnCont.style.display='block';txt.innerText='Rachou!';},1300); setTimeout(()=>{eggEl.style.display='none';petEl.innerText=pet.emoji;petEl.style.display='block';setTimeout(()=>petEl.classList.add('show'),50);txt.innerHTML=`${pet.emoji} <b>${pet.name}</b>!`;rar.innerHTML=`<span class="rarity ${pet.rarity}">${pet.rarity.toUpperCase()} ${eggType=='supernova'?' - SUPERNOVA':''}</span>`;btnCont.style.display='none';btnColl.style.display='block';},2100); }
+function closeHatch(){$('hatchModal').classList.remove('show');}
+function feedPet(petId){ let price=Math.floor(foodAmount*3000); if(coins<price){alert('Precisa '+price.toLocaleString()+' 💰 pra dar '+foodAmount.toFixed(1));return;} let pet=pets.find(p=>p.id==petId); coins-=price; pet.mult+=foodAmount; pet.level=(pet.level||1)+1; buySound(); render(); }
+function equipPet(id){equippedPet=id;buySound();render();}
+function sellPet(id){ let pet=pets.find(p=>p.id==id); if(!pet) return; if(pets.length==1 && equippedPet==id){alert('Não pode vender único equipado');return;} if(!confirm(`Vender ${pet.emoji} ${pet.name} por ${Math.floor(pet.sellValue*pet.mult).toLocaleString()}?`)) return; coins+=Math.floor(pet.sellValue*pet.mult); pets=pets.filter(p=>p.id!=id); if(equippedPet==id) equippedPet=pets[0]?.id||null; buySound(); render(); }
+function buyHelper(id){ if(activeBoost){alert('Já tem boost ativo!');return;} let now=Date.now()/1000; let cdLeft=Math.max(0, Math.floor((cooldowns[id]||0)-now)); if(cdLeft>0){alert(`Cooldown: ${cdLeft}s`);return;} let h=HELPERS.find(x=>x.id==id); if(coins<h.price){alert('Sem grana!');return;} coins-=h.price; activeBoost=h; boostTimer=h.time; cooldowns[id]=now + h.cd; buySound(); render(); clearInterval(boostInterval); boostInterval=setInterval(()=>{ boostTimer--; if(boostTimer<=0){ clearInterval(boostInterval); activeBoost=null; render(); } else { let bb=$('boostBanner'); if(bb) bb.innerHTML=`<div class="boostActive">⚡ ${activeBoost.name.toUpperCase()} x${activeBoost.mult} - ${boostTimer}s</div>`; } },1000); }
+function resetSave(){ if(confirm('Zerar tudo?')){ localStorage.removeItem('HERO_V17'); localStorage.removeItem('HERO_LAST_WIPE'); coins=0; aura='none'; ownedAuras=['none']; pets=[]; equippedPet=null; totalClicks=0; cooldowns={energetico:0,furia:0,god:0}; cyberPoints=0; eventClicks=0; cursorLevel=0; foodAmount=0.5; bestGlobalSaved=0; save(); render(); } }
+function checkGlobalRanking(){ if(!window.firebaseReady) return; let top3 = window.globalTop3||[]; let minTop = top3.length < 3? 0 : Math.min(...top3.map(r=>r.coins||0)); if(coins > minTop && coins > bestGlobalSaved && coins > 500){ if(playerNameLocal && playerNameLocal.length >= 2){ saveGlobalRanking(true); } else { $('nameModal').classList.add('show'); $('playerName').value = playerNameLocal||''; } } }
+async function saveGlobalRanking(isAuto=false){ let name = isAuto? playerNameLocal : ($('playerName').value.trim() || 'Jogador'); if(name.length<2) name='Jogador'; playerNameLocal=name; localStorage.setItem('HERO_NAME',name); bestGlobalSaved=coins; localStorage.setItem('HERO_BEST_GLOBAL',bestGlobalSaved); let data={name, coins:coins, clicks:totalClicks, mult:getTotalMult(), pets:pets.length, timestamp:Date.now()}; if(window.firebaseReady){ try{ await window.firebaseOps.push(window.rankingRef,data); if(!isAuto){ $('nameModal').classList.remove('show'); } }catch(e){} } else if(!isAuto){ $('nameModal').classList.remove('show'); } save(); render(); }
+$('clickBtn').addEventListener('click',()=>{ initA();pop();totalClicks++;coins+=getTotalMult(); if(isCyberEvent){ eventProgress++; if(eventProgress>=100){ eventProgress=0; cyberPoints++; buySound(); } } $('clickBtn').style.transform='scale(0.92)';setTimeout(()=>$('clickBtn').style.transform='scale(1)',80);render();if(totalClicks%50==0) checkGlobalRanking(); });
+setInterval(()=>{ let cps=getCursorCPS(); if(cps>0){ let gain=cps*getTotalMult(); coins+=gain; totalClicks+=cps; if(isCyberEvent){ eventProgress+=cps; while(eventProgress>=100){ eventProgress-=100; cyberPoints++; } } render(); } },1000);
+setInterval(()=>{save();},2000); render(); setInterval(()=>{ render(); },1000);
+</script>
+</body>
+</html>
