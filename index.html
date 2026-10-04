@@ -42,9 +42,17 @@
 .confetti{position:fixed;top:-50px;font-size:30px;animation:fall linear forwards;pointer-events:none;z-index:9999}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
 .hidden{display:none!important}
+/* BALADA RAYA */
+#efeitoRaya{position:fixed;inset:0;pointer-events:none;z-index:9998;display:none}
+#efeitoRaya.ativo{display:block;animation:piscaBalada 0.45s infinite}
+@keyframes piscaBalada{0%{background:rgba(0,0,0,0.75)}50%{background:rgba(255,255,255,0.18)}100%{background:rgba(0,0,0,0.75)}}
 </style>
 </head>
 <body>
+<audio id="musicaLobby" loop preload="auto" src="METAMORFOSE (Lento + Reverb).mp3"></audio>
+<audio id="musicaRaya" loop preload="auto" src="Raya (em câmera lenta).mp3"></audio>
+<div id="efeitoRaya"></div>
+
 <div id="adminEventBar"></div><div id="adminAnnounce"></div>
 <div class="top"><div><b>HERO V17 - SUPERNOVA</b><div style="font-size:9px;opacity:.6" id="connStatus">● Online</div><div id="globalInfo" style="font-size:9px;color:gold"></div></div><div style="text-align:right"><span class="coin" id="coins">0 💰</span><br><span class="cyber" id="cyberPoints">0 🔵</span><div style="font-size:10px;opacity:.5" id="level"></div></div></div>
 <div id="eventBanner" style="display:none"></div>
@@ -81,11 +89,13 @@ let db, rankingRef; let firebaseReady=false;
 try{ const app=initializeApp(firebaseConfig); db=getDatabase(app); rankingRef=ref(db,'ranking'); firebaseReady=true; document.getElementById('connStatus').innerHTML='● Online'; document.getElementById('connStatus').style.color='#00ff88';
   const eventRef = ref(db,'global/event'); const annRef = ref(db,'global/announcement'); const updateRef = ref(db,'global/update'); const coinRef = ref(db,'global/coinGift'); const wipeRef = ref(db,'global/forceWipe');
   const partyRef = ref(db,'global/updateParty'); const supernovaRef = ref(db,'global/supernova');
+  const rayaRef = ref(db,'global/rayaEvent');
   onValue(eventRef,(snap)=>{ const ev=snap.val(); if(!ev) return; window.handleAdminEvent(ev); });
   onValue(annRef,(snap)=>{ const a=snap.val(); if(!a) return; window.handleAdminAnnounce(a); });
   onValue(coinRef,(snap)=>{ const g=snap.val(); if(!g) return; window.handleCoinGift(g); });
   onValue(partyRef,(snap)=>{ const p=snap.val(); if(!p) return; window.handleUpdateParty(p); });
   onValue(supernovaRef,(snap)=>{ const s=snap.val(); if(!s) return; window.handleSupernova(s); });
+  onValue(rayaRef,(snap)=>{ const r=snap.val(); if(!r) return; window.handleRaya(r); });
   onValue(updateRef,(snap)=>{ const u=snap.val(); if(!u) return; if(Date.now() - u.version < 10000){ if(confirm(`🔄 ATUALIZAÇÃO do dono ${u.by}! Recarregar?`)) location.reload(); } });
   onValue(wipeRef,(snap)=>{
     const w=snap.val(); if(!w) return;
@@ -129,6 +139,42 @@ const PETS_POOL=[{name:'Gato',rarity:'common',base:1.2,value:100,emoji:'🐱'},{
 const CYBER_PETS=[{name:'Dragão',rarity:'epic',base:7,value:5000,emoji:'🐲',chance:50},{name:'Serpente Cyber',rarity:'legendary',base:15,value:20000,emoji:'🐍',chance:45},{name:'Dragão Cósmico',rarity:'mythic',base:30,value:150000,emoji:'🌌🐉',isCustom:true,chance:5}];
 const SUPERNOVA_PETS=[{name:'Escorpião',rarity:'epic',base:15,value:50000000000,emoji:'🦂',chance:90},{name:'Sol Pet',rarity:'legendary',base:20,value:100000000000,emoji:'☀️',chance:9.9},{name:'Fênix',rarity:'mythic',base:60,value:500000000000,emoji:'🐦‍🔥',chance:0.1}];
 const EGGS=[{id:'basic',name:'🥚 Ovo Básico',price:500,pool:['common','rare'],list:'🐱 40% 🐶 35% 🐰 15% 🦊 10%'},{id:'epic',name:'💜 Ovo Épico',price:40000,pool:['rare','epic','legendary'],list:'🐰 🦊 🐲 Fênix 🦄 10%'},{id:'mythic',name:'🌟 Ovo Mítico',price:600000,pool:['epic','legendary','mythic'],list:'🐲 Fênix 🦄 👁️ 8%'}];
+
+// SISTEMA DE MUSICA
+let rayaActive=false; let lobbyTentouTocar=false;
+function pararTodasMusicas(){
+  let a=$('musicaLobby'); let b=$('musicaRaya');
+  if(a) a.pause(); if(b) b.pause();
+  $('efeitoRaya').classList.remove('ativo');
+}
+function tocarLobby(){
+  if(rayaActive) return;
+  let a=$('musicaLobby'); let b=$('musicaRaya');
+  if(b) b.pause();
+  $('efeitoRaya').classList.remove('ativo');
+  if(a){ a.volume=0.5; a.play().catch(()=>{}); }
+}
+window.handleRaya=function(r){
+  if(!r) return;
+  if(r.active){
+    rayaActive=true;
+    pararTodasMusicas();
+    let b=$('musicaRaya');
+    if(b){ b.currentTime=0; b.volume=0.7; b.play().catch(()=>{}); }
+    $('efeitoRaya').classList.add('ativo');
+  }else{
+    rayaActive=false;
+    pararTodasMusicas();
+    tocarLobby();
+  }
+};
+document.addEventListener('click', ()=>{
+  if(!lobbyTentouTocar){
+    lobbyTentouTocar=true;
+    if(!rayaActive) tocarLobby();
+  }
+}, {once:true});
+
 window.handleAdminEvent=function(ev){
   if(!ev || ev.mult==1 || ev.name=='PARADO' || ev.name=='Nenhum'){
     if(!supernovaActive){adminMult=1; adminEventName=''; $('adminEventBar').style.display='none'; $('globalInfo').innerText=''; if(adminTimer) clearInterval(adminTimer);}
@@ -206,7 +252,7 @@ function render(){
  let now=Date.now()/1000; let htmlHelp=`<h4>⚡ Boosts</h4>`; HELPERS.forEach(h=>{ let cdLeft = Math.max(0, Math.floor((cooldowns[h.id]||0) - now)); let canUse = cdLeft==0 &&!activeBoost; let label = activeBoost? 'EM USO' : cdLeft>0? `${cdLeft}s` : `ATIVAR - ${h.price} 💰`; htmlHelp+=`<div class="item"><div><b>${h.name}</b> - x${h.mult}<br><small>${h.desc}</small></div><button onclick="buyHelper('${h.id}')" style="padding:8px 12px;border-radius:10px;background:${canUse?'#ffde59':'#333'};color:${canUse?'#000':'#888'};border:none;font-weight:bold" ${canUse?'':'disabled'}>${label}</button></div>`; }); $('tabHelpers').innerHTML=htmlHelp;
  let htmlSell=`<h4>💰 Vender PETS</h4>`; if(pets.length==0) htmlSell+='<small>Sem PETS</small>'; else pets.slice().reverse().forEach(p=>{ let sellVal=Math.floor(p.sellValue * p.mult); htmlSell+=`<div class="item"><div><b>${p.emoji} ${p.name}</b> <span class="rarity ${p.rarity}">${p.rarity}</span><br><small>x${p.mult.toFixed(1)} • ${sellVal.toLocaleString()} 💰</small></div><button onclick="sellPet('${p.id}')" style="padding:8px 12px;border-radius:10px;background:#ff4444;color:#fff;border:none;font-weight:bold">VENDER</button></div>`; }); $('tabSell').innerHTML=htmlSell;
  let htmlCyber=`<h4>🔵 LOJA CYBER</h4><div style="background:#1a1033;padding:8px;border-radius:8px;margin-bottom:10px;font-size:11px">Você tem: <b>${cyberPoints} 🔵</b></div>`; htmlCyber+=`<div class="item" style="border:2px solid #7c3aed"><div><b>👾 Aura Cyber x300</b><br><small>170 🔵</small></div><button onclick="buyCyberAura()" style="padding:8px 12px;border-radius:10px;background:${ownedAuras.includes('cyber')?'#333':cyberPoints>=170?'#7c3aed':'#222'};color:#fff;border:none;font-weight:bold">${ownedAuras.includes('cyber')?(aura=='cyber'?'EQUIPADA':'EQUIPAR'):cyberPoints>=170?'COMPRAR':'170 🔵'}</button></div>`; htmlCyber+=`<div class="item" style="border:2px solid #06b6d4;flex-direction:column;align-items:flex-start"><div style="width:100%;display:flex;justify-content:space-between"><div><b>🥚 Cyber Egg</b><br><small>50 🔵 • 🐲 50% 🐍 45% 🌌🐉 5%</small></div><button onclick="buyCyberEgg()" style="padding:8px 12px;border-radius:10px;background:${cyberPoints>=50?'#06b6d4':'#222'};color:#000;font-weight:bold">CHOCAR 50 🔵</button></div></div>`; $('tabCyber').innerHTML=htmlCyber;
- $('myPetsShort').innerHTML=`<span>📦 ${pets.length} PETS | 🖱️ Lv${cursorLevel} ${cps}x/s | 🔵 ${cyberPoints} | x${getTotalMult().toFixed(1)} ${adminMult>1?'| 🌐 '+adminEventName+' x'+adminMult:''}${supernovaActive?' | ☀️ SUPERNOVA':''}</span>`;
+ $('myPetsShort').innerHTML=`<span>📦 ${pets.length} PETS | 🖱️ Lv${cursorLevel} ${cps}x/s | 🔵 ${cyberPoints} | x${getTotalMult().toFixed(1)} ${adminMult>1?'| 🌐 '+adminEventName+' x'+adminMult:''}${supernovaActive?' | ☀️ SUPERNOVA':''}${rayaActive?' | 🎵 RAYA':''}</span>`;
  $('tabRank').innerHTML='<h4>🏆 RANK GLOBAL</h4><div id="rankingListTab" style="margin-top:10px"></div>'; save();
 }
 function openTab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.nbtn').forEach(e=>e.classList.remove('active'));$('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');document.getElementById('tabBtn'+t.charAt(0).toUpperCase()+t.slice(1))?.classList.add('active');}
