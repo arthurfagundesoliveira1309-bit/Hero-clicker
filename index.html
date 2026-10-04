@@ -286,5 +286,18 @@ $('clickBtn').addEventListener('click',()=>{ initA();pop();totalClicks++;coins+=
 setInterval(()=>{ let cps=getCursorCPS(); if(cps>0){ let gain=cps*getTotalMult(); coins+=gain; totalClicks+=cps; if(isCyberEvent){ eventProgress+=cps; while(eventProgress>=100){ eventProgress-=100; cyberPoints++; } } render(); } },1000);
 setInterval(()=>{save();},2000); render(); setInterval(()=>{ render(); },1000);
 </script>
+  <audio id="lobby" src="metamorfose.mp3" loop></audio>
+<audio id="especial" src="raya.mp3"></audio>
+
+<script>
+  // LOBBY - toca assim que clicar a primeira vez
+  document.addEventListener('click', ()=>{
+    const lobby = document.getElementById('lobby');
+    if(lobby.paused){
+      lobby.volume = 0.4;
+      lobby.play();
+    }
+  }, {once:true});
+</script>
 </body>
 </html>
