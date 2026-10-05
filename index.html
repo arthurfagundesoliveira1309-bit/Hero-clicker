@@ -2,10 +2,12 @@
 <html lang="pt-BR" translate="no">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HERO V19 - METAMORFOSE + RAYA EVENTO</title>
+<title>HERO V19 - RAYA FIX</title>
 <script type="importmap">{"imports":{"firebase/app":"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js","firebase/database":"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"}}</script>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#08080f;color:#fff;font-family:Arial;text-align:center}
+*{box-sizing:border-box}body{margin:0;background:#08080f;color:#fff;font-family:Arial;text-align:center;transition:background 0.2s}
+body.balada{animation:baladaFlash 0.25s infinite alternate}
+@keyframes baladaFlash{0%{background:#08080f}25%{background:#1a0a1a}50%{background:#0a1a1a}75%{background:#1a1a0f}100%{background:#0f0f1a}}
 .top{padding:10px;background:#111;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20}
 .coin{font-weight:900;color:#ffde59}.cyber{font-weight:900;color:#a855f7}
 .clickWrap{position:relative;width:220px;height:220px;margin:15px auto;display:flex;align-items:center;justify-content:center}
@@ -35,6 +37,7 @@
 .boostActive{background:#00ff88;color:#000;padding:8px;border-radius:10px;text-align:center;margin-bottom:10px;font-weight:900;animation:pulse 0.8s infinite}
 .cyberBanner{background:linear-gradient(90deg,#4c1d95,#7c3aed,#06b6d4);padding:10px;border-radius:12px;margin:10px;font-weight:900;animation:pulse 0.8s infinite}
 .supernovaBanner{background:linear-gradient(90deg,#ffff00,#ff6600,#000);padding:10px;border-radius:12px;margin:10px;font-weight:900;animation:pulse 0.6s infinite;color:#fff}
+.rayaBanner{background:linear-gradient(90deg,#ff00ff,#00ffff,#ff00ff);padding:12px;border-radius:12px;margin:10px;font-weight:900;animation:baladaFlash 0.2s infinite;color:#fff;font-size:14px}
 #adminEventBar{position:fixed;top:0;left:0;width:100%;background:linear-gradient(90deg,#a000ff,#ff00ff);color:#fff;padding:6px;text-align:center;font-weight:900;font-size:12px;display:none;z-index:4000}
 #adminAnnounce{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:linear-gradient(45deg,gold,#ffaa00);color:#000;padding:14px 22px;border-radius:20px;font-weight:900;z-index:6000;display:none;max-width:92%;box-shadow:0 0 30px gold}
 .foodBar{background:#1a1a28;border:1px solid #ffaa00;padding:10px;border-radius:12px;margin:10px 0;display:flex;justify-content:space-between;align-items:center}
@@ -51,6 +54,7 @@
 <div class="top"><div><b>HERO V19</b><div style="font-size:9px;opacity:.6" id="connStatus">● Online</div><div id="globalInfo" style="font-size:9px;color:gold"></div></div><div style="text-align:right"><button id="musicBtn" onclick="toggleMusic()" style="background:#222;color:#fff;border:1px solid #444;border-radius:8px;padding:4px 8px;font-size:12px;margin-bottom:4px">🔊 Música ON</button><br><span class="coin" id="coins">0 💰</span><br><span class="cyber" id="cyberPoints">0 🔵</span><div style="font-size:10px;opacity:.5" id="level"></div></div></div>
 <div id="eventBanner" style="display:none"></div>
 <div id="supernovaBanner" style="display:none"></div>
+<div id="rayaBanner" style="display:none"></div>
 <div class="rankBox">🏆 <b>RANK GLOBAL</b><div id="rankingList" style="margin-top:6px">Carregando...</div></div>
 <div id="boostBanner" style="margin:10px;display:none"></div>
 <div class="clickWrap"><div id="auraEl" class="aura"></div><button class="clickBtn" id="clickBtn">CLICAR<br><small id="perClick">1 💰</small><br><small id="eventProgress" style="font-size:9px"></small><br><small id="cursorInfo" style="font-size:9px;color:#00ff88"></small></button></div>
@@ -82,12 +86,13 @@ const firebaseConfig = { apiKey: "AIzaSyDyVYV_7qchf5Gq-zXPac1PbPZj3sct1Ko", auth
 let db, rankingRef; let firebaseReady=false;
 try{ const app=initializeApp(firebaseConfig); db=getDatabase(app); rankingRef=ref(db,'ranking'); firebaseReady=true; document.getElementById('connStatus').innerHTML='● Online'; document.getElementById('connStatus').style.color='#00ff88';
   const eventRef = ref(db,'global/event'); const annRef = ref(db,'global/announcement'); const updateRef = ref(db,'global/update'); const coinRef = ref(db,'global/coinGift'); const wipeRef = ref(db,'global/forceWipe');
-  const partyRef = ref(db,'global/updateParty'); const supernovaRef = ref(db,'global/supernova');
+  const partyRef = ref(db,'global/updateParty'); const supernovaRef = ref(db,'global/supernova'); const rayaRef = ref(db,'global/rayaEvent');
   onValue(eventRef,(snap)=>{ const ev=snap.val(); if(!ev) return; window.handleAdminEvent(ev); });
   onValue(annRef,(snap)=>{ const a=snap.val(); if(!a) return; window.handleAdminAnnounce(a); });
   onValue(coinRef,(snap)=>{ const g=snap.val(); if(!g) return; window.handleCoinGift(g); });
   onValue(partyRef,(snap)=>{ const p=snap.val(); if(!p) return; window.handleUpdateParty(p); });
   onValue(supernovaRef,(snap)=>{ const s=snap.val(); if(!s) return; window.handleSupernova(s); });
+  onValue(rayaRef,(snap)=>{ const r=snap.val(); if(!r){return;} window.handleRayaEvent(r); });
   onValue(updateRef,(snap)=>{ const u=snap.val(); if(!u) return; if(Date.now() - u.version < 10000){ if(confirm(`🔄 ATUALIZAÇÃO do dono ${u.by}! Recarregar?`)) location.reload(); } });
   onValue(wipeRef,(snap)=>{
     const w=snap.val(); if(!w) return;
@@ -117,15 +122,14 @@ let audioCtx; function initA(){ if(!audioCtx) audioCtx=new(window.AudioContext||
 function pop(){initA();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=750;g.gain.setValueAtTime(0.15,audioCtx.currentTime);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.08);}
 function buySound(){initA();[0,0.1].forEach(d=>{let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=500+d*600;g.gain.setValueAtTime(0.3,audioCtx.currentTime+d);o.connect(g);g.connect(audioCtx.destination);o.start(audioCtx.currentTime+d);o.stop(audioCtx.currentTime+d+0.15);});}
 function crackSound(){initA();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=180;o.type='square';g.gain.setValueAtTime(0.5,audioCtx.currentTime);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.3);}
-// MUSIC SYSTEM - FINAL
-let hasInteracted=false, isMusicMuted=false, isEventMusicActive=false;
+let hasInteracted=false, isMusicMuted=false, isEventMusicActive=false, isRayaBaladaActive=false;
 function getMetamorfose(){return document.getElementById('bgMusic0');}
 function getRaya(){return document.getElementById('bgMusic1');}
-function initMusic(){let m=getMetamorfose(),r=getRaya(); if(m){m.volume=0.3; m.loop=true;} if(r){r.volume=0.3; r.loop=true;}}
-function playMetamorfose(){let m=getMetamorfose(),r=getRaya(); if(!m||isMusicMuted) return; if(r) r.pause(); m.play().catch(e=>console.log('metamorfose play blocked',e));}
-function playRaya(){let m=getMetamorfose(),r=getRaya(); if(!r||isMusicMuted) return; if(m){m.pause();} r.currentTime=0; r.play().catch(e=>console.log('raya play blocked',e));}
-function startMusicOnFirstClick(){if(hasInteracted) return; hasInteracted=true; initMusic(); if(isEventMusicActive) playRaya(); else playMetamorfose();}
-function toggleMusic(){isMusicMuted=!isMusicMuted; let btn=document.getElementById('musicBtn'), m=getMetamorfose(), r=getRaya(); if(isMusicMuted){ if(m) m.pause(); if(r) r.pause(); if(btn) btn.innerText='🔇 Música OFF';} else { if(hasInteracted){ if(isEventMusicActive) playRaya(); else playMetamorfose();} if(btn) btn.innerText='🔊 Música ON';}}
+function initMusic(){let m=getMetamorfose(),r=getRaya(); if(m){m.volume=0.3; m.loop=true;} if(r){r.volume=0.35; r.loop=true;}}
+function playMetamorfose(){let m=getMetamorfose(),r=getRaya(); if(!m||isMusicMuted) return; if(r) r.pause(); m.play().catch(()=>{});}
+function playRaya(){let m=getMetamorfose(),r=getRaya(); if(!r||isMusicMuted) return; if(m){m.pause();} r.currentTime=0; r.play().catch(()=>{});}
+function startMusicOnFirstClick(){if(hasInteracted) return; hasInteracted=true; initMusic(); if(isEventMusicActive||isRayaBaladaActive) playRaya(); else playMetamorfose();}
+function toggleMusic(){isMusicMuted=!isMusicMuted; let btn=document.getElementById('musicBtn'), m=getMetamorfose(), r=getRaya(); if(isMusicMuted){ if(m) m.pause(); if(r) r.pause(); if(btn) btn.innerText='🔇 Música OFF';} else { if(hasInteracted){ if(isEventMusicActive||isRayaBaladaActive) playRaya(); else playMetamorfose();} if(btn) btn.innerText='🔊 Música ON';}}
 initMusic();
 let coins=0,aura='none',ownedAuras=['none'],pets=[],equippedPet=null,totalClicks=0,playerNameLocal=localStorage.getItem('HERO_NAME')||'';
 let activeBoost=null, boostTimer=0, boostInterval=null, cooldowns={energetico:0,furia:0,god:0};
@@ -141,10 +145,28 @@ const PETS_POOL=[{name:'Gato',rarity:'common',base:1.2,value:100,emoji:'🐱'},{
 const CYBER_PETS=[{name:'Dragão',rarity:'epic',base:7,value:5000,emoji:'🐲',chance:50},{name:'Serpente Cyber',rarity:'legendary',base:15,value:20000,emoji:'🐍',chance:45},{name:'Dragão Cósmico',rarity:'mythic',base:30,value:150000,emoji:'🌌🐉',isCustom:true,chance:5}];
 const SUPERNOVA_PETS=[{name:'Escorpião',rarity:'epic',base:15,value:50000000000,emoji:'🦂',chance:90},{name:'Sol Pet',rarity:'legendary',base:20,value:100000000000,emoji:'☀️',chance:9.9},{name:'Fênix',rarity:'mythic',base:60,value:500000000000,emoji:'🐦‍🔥',chance:0.1}];
 const EGGS=[{id:'basic',name:'🥚 Ovo Básico',price:500,pool:['common','rare'],list:'🐱 40% 🐶 35% 🐰 15% 🦊 10%'},{id:'epic',name:'💜 Ovo Épico',price:40000,pool:['rare','epic','legendary'],list:'🐰 🦊 🐲 Fênix 🦄 10%'},{id:'mythic',name:'🌟 Ovo Mítico',price:600000,pool:['epic','legendary','mythic'],list:'🐲 Fênix 🦄 👁️ 8%'}];
+window.handleRayaEvent=function(r){
+  if(!r) return;
+  if(r.active){
+    isRayaBaladaActive=true; isEventMusicActive=true;
+    document.body.classList.add('balada');
+    $('rayaBanner').style.display='block';
+    $('rayaBanner').innerHTML=`<div class="rayaBanner">🎵 RAYA TOCANDO - MODO BALADA ATIVO 🪩</div>`;
+    if(hasInteracted &&!isMusicMuted) playRaya();
+  } else {
+    isRayaBaladaActive=false; isEventMusicActive=false;
+    document.body.classList.remove('balada');
+    $('rayaBanner').style.display='none';
+    let rr=getRaya(); if(rr) rr.pause();
+    if(hasInteracted &&!isMusicMuted) playMetamorfose();
+  }
+  render();
+};
 window.handleAdminEvent=function(ev){
+  if(isRayaBaladaActive) return;
   const isValid = ev && ev.mult!=1 && ev.name!='PARADO' && ev.name!='Nenhum';
   if(!isValid){
-    if(isEventMusicActive){
+    if(isEventMusicActive &&!isRayaBaladaActive){
       isEventMusicActive=false;
       let r=getRaya(); if(r) r.pause();
       if(hasInteracted &&!isMusicMuted) playMetamorfose();
@@ -154,12 +176,12 @@ window.handleAdminEvent=function(ev){
   }
   adminMult=ev.mult||1; adminEventName=ev.name||'EVENTO'; adminEndTime=(ev.startedAt||Date.now())+(ev.duration||60)*1000;
   let by=ev.byName||ev.by||'ADMIN'; $('adminEventBar').style.display='block'; $('globalInfo').innerText=`🌐 ${adminEventName} x${adminMult} por ${by}`;
-  if(!isEventMusicActive){
+  if(!isEventMusicActive &&!isRayaBaladaActive){
     isEventMusicActive=true;
     if(hasInteracted &&!isMusicMuted) playRaya();
   }
   if(adminTimer) clearInterval(adminTimer);
-  adminTimer=setInterval(()=>{let left=Math.max(0,Math.floor((adminEndTime-Date.now())/1000)); $('adminEventBar').innerText=`⚡ ${adminEventName} x${adminMult} | ${left}s | por ${by}`; if(left<=0){clearInterval(adminTimer); isEventMusicActive=false; let r=getRaya(); if(r) r.pause(); if(hasInteracted &&!isMusicMuted) playMetamorfose(); if(!supernovaActive){$('adminEventBar').style.display='none'; adminMult=1; $('globalInfo').innerText='';} render();} render();},1000); render();
+  adminTimer=setInterval(()=>{let left=Math.max(0,Math.floor((adminEndTime-Date.now())/1000)); $('adminEventBar').innerText=`⚡ ${adminEventName} x${adminMult} | ${left}s | por ${by}`; if(left<=0){clearInterval(adminTimer); if(!isRayaBaladaActive){isEventMusicActive=false; let r=getRaya(); if(r) r.pause(); if(hasInteracted &&!isMusicMuted) playMetamorfose();} if(!supernovaActive){$('adminEventBar').style.display='none'; adminMult=1; $('globalInfo').innerText='';} render();} render();},1000); render();
 };
 window.handleAdminAnnounce=function(a){ if(!a||!a.text) return; let b=$('adminAnnounce'); b.innerText=`👑 ${a.byName||a.by}: ${a.text}`; b.style.display='block'; setTimeout(()=>b.style.display='none',5000); };
 window.handleCoinGift=function(g){ if(!g||!g.amount||g.amount<=0) return; if(Date.now() - (g.startedAt||0) > 12000) return; if(g.startedAt===lastCoinTime) return; lastCoinTime=g.startedAt; coins+=g.amount; buySound(); let b=$('adminAnnounce'); b.innerText=`💰 CHUVA! +${g.amount.toLocaleString()} moedas de ${g.byName||g.by}!`; b.style.display='block'; setTimeout(()=>b.style.display='none',5000); save(); render(); };
@@ -175,7 +197,7 @@ setInterval(checkCyberEvent, 60000); checkCyberEvent();
 function render(){
  let total=getTotalMult(); let cps=getCursorCPS();
  $('coins').innerText=coins.toLocaleString()+' 💰'; $('cyberPoints').innerText=cyberPoints+' 🔵 CYBER';
- $('level').innerText='x'+total.toFixed(1)+' • '+pets.length+' PETS'+(cps>0?' • 🖱️ '+cps+'/s':'')+(adminMult>1?' • 🌐 '+adminEventName+' x'+adminMult:'');
+ $('level').innerText='x'+total.toFixed(1)+' • '+pets.length+' PETS'+(cps>0?' • 🖱️ '+cps+'/s':'')+(adminMult>1?' • 🌐 '+adminEventName+' x'+adminMult:'')+(isRayaBaladaActive?' • 🎵 RAYA BALADA':'');
  $('perClick').innerText=total.toFixed(1)+' 💰'; $('eventProgress').innerText=isCyberEvent?`🔵 ${eventProgress}/100`:''; $('petCount').innerText=pets.length+' PETS'; $('totalClicks').innerText=totalClicks.toLocaleString(); $('auraEl').className='aura '+(AURAS.find(a=>a.id==aura)?.effect||''); $('cursorInfo').innerText=cps>0?`🖱️ ${cps} cliques/s`:'';
  if(activeBoost){ $('boostBanner').style.display='block'; $('boostBanner').innerHTML=`<div class="boostActive">⚡ ${activeBoost.name.toUpperCase()} x${activeBoost.mult} - ${boostTimer}s</div>`; } else { $('boostBanner').style.display='none'; }
  let htmlAura=''; AURAS.forEach(a=>{ if(a.isCyber &&!a.isSupernova){} else if(a.isSupernova &&!supernovaActive &&!ownedAuras.includes('supernova')) return; let owned=ownedAuras.includes(a.id); let priceText = a.isCyber? `${a.cyberPrice} 🔵` : a.isSupernova? `1 TRILHÃO 💰` : `${a.price.toLocaleString()} 💰`; let canBuy = a.isCyber? cyberPoints>=a.cyberPrice : a.isSupernova? coins>=1000000000000 : coins>=a.price; htmlAura+=`<div class="item" style="${a.isSupernova?'border:2px solid #ffaa00;background:#1a1200':''}"><div><b>${a.name} x${a.mult}</b><br><small style="${canBuy?'color:#00ff88':''}">${priceText}</small></div><button onclick="buyAura('${a.id}')" style="padding:8px 12px;border-radius:10px;border:none;font-weight:bold;background:${aura==a.id?'#00ff88':owned?'#333':'#fff'}">${aura==a.id?'EQUIPADA':owned?'EQUIPAR':'COMPRAR'}</button></div>`; }); $('tabAura').innerHTML=htmlAura;
@@ -184,7 +206,7 @@ function render(){
  let now=Date.now()/1000; let htmlHelp=`<h4>⚡ Boosts</h4>`; HELPERS.forEach(h=>{ let cdLeft = Math.max(0, Math.floor((cooldowns[h.id]||0) - now)); let canUse = cdLeft==0 &&!activeBoost; let label = activeBoost? 'EM USO' : cdLeft>0? `${cdLeft}s` : `ATIVAR - ${h.price} 💰`; htmlHelp+=`<div class="item"><div><b>${h.name}</b> - x${h.mult}<br><small>${h.desc}</small></div><button onclick="buyHelper('${h.id}')" style="padding:8px 12px;border-radius:10px;background:${canUse?'#ffde59':'#333'};color:${canUse?'#000':'#888'};border:none;font-weight:bold" ${canUse?'':'disabled'}>${label}</button></div>`; }); $('tabHelpers').innerHTML=htmlHelp;
  let htmlSell=`<h4>💰 Vender PETS</h4>`; if(pets.length==0) htmlSell+='<small>Sem PETS</small>'; else pets.slice().reverse().forEach(p=>{ let sellVal=Math.floor(p.sellValue * p.mult); htmlSell+=`<div class="item"><div><b>${p.emoji} ${p.name}</b> <span class="rarity ${p.rarity}">${p.rarity}</span><br><small>x${p.mult.toFixed(1)} • ${sellVal.toLocaleString()} 💰</small></div><button onclick="sellPet('${p.id}')" style="padding:8px 12px;border-radius:10px;background:#ff4444;color:#fff;border:none;font-weight:bold">VENDER</button></div>`; }); $('tabSell').innerHTML=htmlSell;
  let htmlCyber=`<h4>🔵 LOJA CYBER</h4><div style="background:#1a1033;padding:8px;border-radius:8px;margin-bottom:10px;font-size:11px">Você tem: <b>${cyberPoints} 🔵</b></div>`; htmlCyber+=`<div class="item" style="border:2px solid #7c3aed"><div><b>👾 Aura Cyber x300</b><br><small>170 🔵</small></div><button onclick="buyCyberAura()" style="padding:8px 12px;border-radius:10px;background:${ownedAuras.includes('cyber')?'#333':cyberPoints>=170?'#7c3aed':'#222'};color:#fff;border:none;font-weight:bold">${ownedAuras.includes('cyber')?(aura=='cyber'?'EQUIPADA':'EQUIPAR'):cyberPoints>=170?'COMPRAR':'170 🔵'}</button></div>`; htmlCyber+=`<div class="item" style="border:2px solid #06b6d4;flex-direction:column;align-items:flex-start"><div style="width:100%;display:flex;justify-content:space-between"><div><b>🥚 Cyber Egg</b><br><small>50 🔵 • 🐲 50% 🐍 45% 🌌🐉 5%</small></div><button onclick="buyCyberEgg()" style="padding:8px 12px;border-radius:10px;background:${cyberPoints>=50?'#06b6d4':'#222'};color:#000;font-weight:bold">CHOCAR 50 🔵</button></div></div>`; $('tabCyber').innerHTML=htmlCyber;
- $('myPetsShort').innerHTML=`<span>📦 ${pets.length} PETS | 🖱️ Lv${cursorLevel} ${cps}x/s | 🔵 ${cyberPoints} | x${getTotalMult().toFixed(1)} ${adminMult>1?'| 🌐 '+adminEventName+' x'+adminMult:''}${supernovaActive?' | ☀️ SUPERNOVA':''}</span>`;
+ $('myPetsShort').innerHTML=`<span>📦 ${pets.length} PETS | 🖱️ Lv${cursorLevel} ${cps}x/s | 🔵 ${cyberPoints} | x${getTotalMult().toFixed(1)} ${adminMult>1?'| 🌐 '+adminEventName+' x'+adminMult:''}${supernovaActive?' | ☀️ SUPERNOVA':''}${isRayaBaladaActive?' | 🎵 RAYA BALADA':''}</span>`;
  $('tabRank').innerHTML='<h4>🏆 RANK GLOBAL</h4><div id="rankingListTab" style="margin-top:10px"></div>'; save();
 }
 function openTab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.nbtn').forEach(e=>e.classList.remove('active'));$('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');document.getElementById('tabBtn'+t.charAt(0).toUpperCase()+t.slice(1))?.classList.add('active');}
