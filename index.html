@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR" translate="no">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HERO V24 - CONQUISTAS + ENCHANT</title>
+<script type="importmap">{"imports":{"firebase/app":"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js","firebase/database":"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"}}</script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#08080f;color:#fff;font-family:Arial;text-align:center;transition:background 0.2s}
+body.balada{animation:baladaFlash 0.25s infinite alternate}
+@keyframes baladaFlash{0%{background:#08080f}25%{background:#1a0a1a}50%{background:#0a1a1a}75%{background:#1a1a0f}100%{background:#0f0f1a}}
+.top{padding:10px;background:#111;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20}
+.coin{font-weight:900;color:#ffde59}.cyber{font-weight:900;color:#a855f7}
+.clickWrap{position:relative;width:220px;height:220px;margin:15px auto;display:flex;align-items:center;justify-content:center}
+.aura{position:absolute;inset:-15px;border-radius:50%;pointer-events:none;z-index:1}
+.aura.cinza{border:3px solid #888;box-shadow:0 0 20px #888}.aura.azul{border:3px solid #00aaff;box-shadow:0 0 35px #00aaff;animation:spin 3s linear infinite}
+.aura.fogo{border:4px solid #ff4400;box-shadow:0 0 40px #ff4400;animation:pulse 0.8s infinite}.aura.gelo{border:4px solid #00ffff;box-shadow:0 0 40px #00ffff;animation:spin 2s linear infinite reverse}
+.aura.void{border:4px solid #a000ff;background:conic-gradient(from 0deg,#a000ff,transparent,#a000ff,transparent);box-shadow:0 0 50px #a000ff;animation:spin 1.2s linear infinite}
+.aura.estelar{border:5px solid gold;background:conic-gradient(from 0deg,gold,#fff,gold);box-shadow:0 0 50px gold;animation:spin 0.9s linear infinite}
+.aura.cosmica{border:5px solid #ff00ff;background:conic-gradient(from 0deg,#ff00ff,#00ffff,#ffff00,#ff00ff);box-shadow:0 0 60px #ff00ff;animation:spin 0.6s linear infinite}
+.aura.cyber{border:5px solid #6d28d9;background:conic-gradient(from 0deg,#1e1b4b,#7c3aed,#06b6d4,#1e1b4b);box-shadow:0 0 60px #7c3aed,0 0 100px #06b6d4;animation:spin 0.5s linear infinite}
+.aura.supernova{border:5px solid #ffaa00;background:conic-gradient(from 0deg,#ffff00,#ff6600,#000000,#ffff00);box-shadow:0 0 60px #ffff00,0 0 100px #ff6600;animation:spin 0.5s linear infinite}
+.aura.halloween{border:5px solid #ff6600;background:conic-gradient(from 0deg,#ff6600,#000,#ffaa00,#ff6600);box-shadow:0 0 60px #ff6600,0 0 100px #ff0000;animation:spin 0.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.clickBtn{width:200px;height:200px;border-radius:50%;border:none;font-weight:900;font-size:28px;z-index:2;position:relative;transition:all 0.3s}
+.clickBtn.skin-default{background:linear-gradient(#00ff88,#00cc66);color:#000}
+.clickBtn.skin-dourada{background:linear-gradient(180deg,#ffeb7a,#ffcc00,#b89600);color:#000;box-shadow:0 0 30px gold,inset 0 -8px 15px rgba(0,0,0,.4);border:2px solid gold}
+.clickBtn.skin-gelo{background:linear-gradient(180deg,#e0ffff,#00aaff,#0022aa);color:#fff;text-shadow:0 0 8px #0ff;box-shadow:0 0 30px #00ffff}
+.clickBtn.skin-fogo{background:linear-gradient(180deg,#ffcc00,#ff4400,#880000);color:#fff;text-shadow:0 0 10px #ff0;box-shadow:0 0 35px #ff4400}
+.clickBtn.skin-void{background:linear-gradient(180deg,#d080ff,#6000aa,#000);color:#fff;box-shadow:0 0 40px #a000ff;border:2px solid #a000ff}
+.clickBtn.skin-cosmica{background:linear-gradient(45deg,#ff00ff,#00ffff,#ffff00,#ff00ff);color:#000;font-weight:900;box-shadow:0 0 50px #ff00ff;animation:spin 3s linear infinite}
+.rankBox{background:#15151f;border:1px solid #333;border-radius:12px;padding:10px;margin:10px;font-size:12px;text-align:left}
+.rank1{color:gold;font-weight:900}.rank2{color:#ccc;font-weight:900}.rank3{color:#cd7f32;font-weight:900}
+#shop{position:fixed;top:0;right:0;width:100%;max-width:390px;height:100%;background:#0f0f19;z-index:100;padding:16px;text-align:left;overflow:auto;transform:translateX(100%);transition:.3s}
+#shop.open{transform:translateX(0)}.tab{display:none}.tab.active{display:block}
+.item{background:#1a1a28;padding:12px;border-radius:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #2a2a40}
+.pet{padding:10px;border-radius:12px;margin-bottom:8px;background:#151525;border:1px solid #333;display:flex;justify-content:space-between;align-items:center}
+.petEmoji{font-size:22px;animation:petFloat 2s ease-in-out infinite;display:inline-block}@keyframes petFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.rarity{font-size:9px;padding:2px 6px;border-radius:6px;font-weight:bold}.common{background:#555}.rare{background:#0077ff}.epic{background:#a000ff}.legendary{background:gold;color:#000}.mythic{background:linear-gradient(45deg,#ff00ff,#00ffff);color:#000}.cyberRarity{background:linear-gradient(45deg,#4c1d95,#06b6d4);color:#fff}.supernovaRarity{background:linear-gradient(45deg,#ffff00,#ff6600);color:#000}.ultrapetRarity{background:#000;color:#fff;box-shadow:0 0 8px #fff;animation:ultraGlow 1.5s infinite}
+.halloweenRarity{background:linear-gradient(45deg,#ff6600,#000);color:#ffaa00;border:1px solid #ff6600}
+@keyframes ultraGlow{0%{filter:brightness(1)}50%{filter:brightness(1.6)}100%{filter:brightness(1)}}
+.nbtn{padding:6px 8px;border-radius:20px;border:1px solid #333;background:#1a1a28;color:#fff;font-weight:bold;font-size:8px;margin:2px}.nbtn.active{background:#00ff88;color:#000}
+#hatchModal,#nameModal,#kitchenGame,#enchantModal{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px}
+#hatchModal.show,#nameModal.show,#enchantModal.show{display:flex}
+#kitchenGame.show{display:flex;background:#000;z-index:800}
+.eggAnim{font-size:90px}.shaking{animation:eggShake 0.12s infinite}.cracking{animation:eggCrack 0.6s forwards}
+@keyframes eggShake{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}@keyframes eggCrack{0%{transform:scale(1)}100%{transform:scale(0);opacity:0}}
+.petReveal{font-size:80px;display:none}.petReveal.show{display:block;animation:revealPop 0.6s forwards}@keyframes revealPop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.boostActive{background:#00ff88;color:#000;padding:8px;border-radius:10px;text-align:center;margin-bottom:10px;font-weight:900;animation:pulse 0.8s infinite}
+.cyberBanner{background:linear-gradient(90deg,#4c1d95,#7c3aed,#06b6d4);padding:10px;border-radius:12px;margin:10px;font-weight:900;animation:pulse 0.8s infinite}
+.supernovaBanner{background:linear-gradient(90deg,#ffff00,#ff6600,#000);padding:10px;border-radius:12px;margin:10px;font-weight:900;animation:pulse 0.6s infinite;color:#fff}
+.halloweenBanner{background:linear-gradient(90deg,#ff6600,#ff0000,#000);padding:12px;border-radius:12px;margin:10px;font-weight:900;animation:pulse 0.6s infinite;color:#fff;border:2px solid #ffaa00;box-shadow:0 0 20px #ff6600}
+.rayaBanner{background:linear-gradient(90deg,#ff00ff,#00ffff,#ff00ff);padding:12px;border-radius:12px;margin:10px;font-weight:900;animation:baladaFlash 0.2s infinite;color:#fff;font-size:14px}
+#adminEventBar{position:fixed;top:0;left:0;width:100%;background:linear-gradient(90deg,#a000ff,#ff00ff);color:#fff;padding:6px;text-align:center;font-weight:900;font-size:12px;display:none;z-index:4000}
+#adminAnnounce{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:linear-gradient(45deg,gold,#ffaa00);color:#000;padding:14px 22px;border-radius:20px;font-weight:900;z-index:6000;display:none;max-width:92%;box-shadow:0 0 30px gold}
+.kitchenBar{background:#1a1a28;border:1px solid #00ff88;padding:10px;border-radius:12px;margin:10px 0;display:flex;justify-content:space-between;align-items:center}
+.ingItem{font-size:28px;position:absolute;top:-50px;animation:ingFall 1.5s linear forwards;cursor:pointer;user-select:none}
+@keyframes ingFall{to{transform:translateY(110vh) rotate(180deg)}}
+.fusionBox{background:#14141f;border:2px dashed #444;border-radius:14px;padding:14px;margin:12px 0;text-align:center}
+.fusionEgg{font-size:34px;animation:bounce 1s infinite;display:inline-block}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.skinPreview{width:34px;height:34px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:middle;border:2px solid #444}
+.achItem{opacity:.4}.achItem.unlocked{opacity:1;border-color:gold;background:#1a1600}
+.roulette{width:200px;height:200px;border-radius:50%;border:6px solid gold;background:conic-gradient(gold,#ffaa00,gold,#ff6600,gold);display:flex;align-items:center;justify-content:center;font-size:50px;animation:spin 0.3s linear infinite}
+.roulette.stop{animation:none}
+</style>
+</head>
+<body>
+<audio id="bgMusic0" src="metamorfose.mp3" preload="auto" loop></audio>
+<audio id="bgMusic1" src="raya.mp3" preload="auto" loop></audio>
+<audio id="bgMusic2" src="halloween.mp3" preload="auto" loop></audio>
+<div id="adminEventBar"></div><div id="adminAnnounce"></div>
+<div class="top"><div><b>HERO V24 - FINAL</b><div style="font-size:9px;opacity:.6" id="connStatus">● Online</div><div id="globalInfo" style="font-size:9px;color:gold"></div></div><div style="text-align:right"><button id="musicBtn" onclick="toggleMusic()" style="background:#222;color:#fff;border:1px solid #444;border-radius:8px;padding:4px 8px;font-size:12px;margin-bottom:4px">🔊 Música ON</button><br><span class="coin" id="coins">0 💰</span><br><span class="cyber" id="cyberPoints">0 🔵</span><div style="font-size:10px;opacity:.5" id="level"></div></div></div>
+<div id="eventBanner" style="display:none"></div><div id="supernovaBanner" style="display:none"></div><div id="halloweenBanner" style="display:none"></div><div id="rayaBanner" style="display:none"></div>
+<div class="rankBox">🏆 <b>RANK GLOBAL</b><div id="rankingList" style="margin-top:6px">Carregando...</div></div>
+<div id="boostBanner" style="margin:10px;display:none"></div>
+<div class="clickWrap"><div id="auraEl" class="aura"></div><button class="clickBtn skin-default" id="clickBtn">CLICAR<br><small id="perClick">1 💰</small><br><small id="skinBonus" style="font-size:8px;color:#ffaa00;font-weight:900"></small><br><small id="eventProgress" style="font-size:9px"></small><br><small id="cursorInfo" style="font-size:9px;color:#00ff88"></small></button></div>
+<div style="padding:10px">
+<button onclick="shop.classList.add('open')" style="width:100%;padding:14px;background:#1a1a28;border:1px solid #333;color:#fff;border-radius:12px;font-weight:bold">LOJA 🛒 - <span id="petCount">0 PETS</span></button>
+<div id="myPetsShort" style="margin-top:8px;text-align:left;font-size:12px;background:#111;padding:8px;border-radius:8px"></div>
+<div style="font-size:10px;opacity:.4;margin-top:6px">Cliques: <span id="totalClicks">0</span></div>
+<button onclick="resetSave()" style="margin-top:10px;padding:6px 10px;background:#222;color:#fff;border:none;border-radius:8px;font-size:10px">ZERAR SAVE</button>
+</div>
+<div id="hatchModal"><div id="eggDisplay" class="eggAnim">🥚</div><div id="petReveal" class="petReveal"></div><div id="hatchText" style="margin-top:16px;font-weight:900;font-size:20px"></div><div id="hatchRarity" style="margin-top:10px"></div><button id="btnContinue" onclick="closeHatch()" style="display:none;margin-top:16px;padding:14px 28px;background:#00ff88;color:#000;border:none;border-radius:20px;font-weight:900">CONTINUAR ➜</button><button id="btnCollect" onclick="closeHatch()" style="display:none;margin-top:16px;padding:14px 28px;background:#fff;color:#000;border:none;border-radius:20px;font-weight:900">COLETAR!</button></div>
+<div id="nameModal"><h2>🏆 TOP 3!</h2><input id="playerName" placeholder="Seu nome" maxlength="12" style="padding:12px;border-radius:10px;border:none;width:200px;text-align:center;font-weight:bold;font-size:16px"><div style="margin-top:12px;display:flex;gap:10px"><button onclick="saveGlobalRanking(false)" style="padding:12px 20px;background:#00ff88;color:#000;border:none;border-radius:12px;font-weight:900">SALVAR</button><button onclick="$('nameModal').classList.remove('show')" style="padding:12px 20px;background:#333;color:#fff;border:none;border-radius:12px">FECHAR</button></div></div>
+<div id="kitchenGame"><div style="position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;font-weight:900"><span id="kitchenTimer">30s</span><span id="kitchenScore">0 coletados</span><button onclick="stopKitchenGame()" style="background:#ff4444;color:#fff;border:none;padding:6px 10px;border-radius:8px">X SAIR</button></div><div style="font-size:14px;opacity:.6;margin-top:60px">CLIQUE NOS INGREDIENTES!</div><div id="kitchenArea" style="position:absolute;inset:0;overflow:hidden"></div></div>
+<div id="enchantModal"><div id="roulette" class="roulette">🎰</div><div id="enchantResult" style="margin-top:20px;font-weight:900;font-size:18px;text-align:center"></div><button onclick="$('enchantModal').classList.remove('show')" style="margin-top:16px;padding:12px 20px;background:#fff;color:#000;border:none;border-radius:12px;font-weight:900">FECHAR</button></div>
+
+<div id="shop">
+<div style="display:flex;justify-content:space-between"><h3>LOJA V24</h3><button onclick="shop.classList.remove('open')" style="background:#222;color:#fff;border:none;padding:8px 12px;border-radius:10px">X</button></div>
+<div style="margin-bottom:10px;display:flex;flex-wrap:wrap">
+<button class="nbtn active" id="tabBtnAura" onclick="openTab('aura')">AURAS</button>
+<button class="nbtn" id="tabBtnSkins" onclick="openTab('skins')" style="background:linear-gradient(45deg,#ffcc00,#ff6600);color:#000">🎨 SKINS</button>
+<button class="nbtn" id="tabBtnPets" onclick="openTab('pets')">PETS</button>
+<button class="nbtn" id="tabBtnKitchen" onclick="openTab('kitchen')" style="background:#00ff88;color:#000">🍳 COZINHA</button>
+<button class="nbtn" id="tabBtnAch" onclick="openTab('ach')" style="background:gold;color:#000">🏆 CONQUISTAS</button>
+<button class="nbtn" id="tabBtnEnchant" onclick="openTab('enchant')" style="background:linear-gradient(45deg,#a000ff,#ff00ff);color:#fff">✨ ENCANT</button>
+<button class="nbtn" id="tabBtnFusion" onclick="openTab('fusion')">⚙️ FUSÃO</button>
+<button class="nbtn" id="tabBtnCursor" onclick="openTab('cursor')">CURSOR</button>
+<button class="nbtn" id="tabBtnHelpers" onclick="openTab('helpers')">BOOSTS</button>
+<button class="nbtn" id="tabBtnSell" onclick="openTab('sell')">VENDAS</button>
+<button class="nbtn" id="tabBtnCyber" onclick="openTab('cyber')">CYBER</button>
+<button class="nbtn" id="tabBtnRank" onclick="openTab('rank')">RANK</button>
+</div>
+<div id="tabAura" class="tab active"></div><div id="tabSkins" class="tab"></div><div id="tabPets" class="tab"></div><div id="tabKitchen" class="tab"></div><div id="tabAch" class="tab"></div><div id="tabEnchant" class="tab"></div>
+<div id="tabFusion" class="tab"><div class="fusionBox" style="border-color:#00ff88"><div style="font-size:50px">⚙️</div><h3>MÁQUINA DE FUSÃO</h3><p id="fusionCooldown" style="font-weight:900;color:#00ff88"></p><div id="fusionSelected" style="font-size:11px;margin:8px 0;color:#ffde59"></div><button id="btnFusion" class="nbtn" style="padding:10px 18px;font-size:12px;background:#00ff88;color:#000" onclick="doFusion()">FUSIONAR</button><div id="fusionPetsPick" style="margin-top:10px"></div></div><div class="fusionBox" style="border-color:#fff"><div style="font-size:40px">💫</div><h3 class="ultrapetRarity" style="display:inline-block;padding:4px 10px;border-radius:8px">ULTRAPET MACHINE</h3><div id="ultraList"></div></div><h4>🥚 Ovos Rachando</h4><div id="fusionEggs"></div></div>
+<div id="tabCursor" class="tab"></div><div id="tabHelpers" class="tab"></div><div id="tabSell" class="tab"></div><div id="tabCyber" class="tab"></div><div id="tabRank" class="tab"></div>
+</div>
+<script type="module">
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } from "firebase/database";
+const firebaseConfig = { apiKey: "AIzaSyDyVYV_7qchf5Gq-zXPac1PbPZj3sct1Ko", authDomain: "hero-clicker-53e1c.firebaseapp.com", databaseURL: "https://hero-clicker-53e1c-default-rtdb.firebaseio.com", projectId: "hero-clicker-53e1c", storageBucket: "hero-clicker-53e1c.firebasestorage.app", messagingSenderId: "38226266560", appId: "1:38226266560:web:9351f0b04b78c156002025" };
+let db, rankingRef; let firebaseReady=false;
+try{ const app=initializeApp(firebaseConfig); db=getDatabase(app); rankingRef=ref(db,'ranking'); firebaseReady=true;
+  const eventRef = ref(db,'global/event'); const annRef = ref(db,'global/announcement'); const updateRef = ref(db,'global/update'); const coinRef = ref(db,'global/coinGift'); const wipeRef = ref(db,'global/forceWipe');
+  const partyRef = ref(db,'global/updateParty'); const supernovaRef = ref(db,'global/supernova'); const rayaRef = ref(db,'global/rayaEvent'); const halloweenRef = ref(db,'global/halloween');
+  onValue(eventRef,(snap)=>{ const ev=snap.val(); if(!ev) return; window.handleAdminEvent(ev); });
+  onValue(annRef,(snap)=>{ const a=snap.val(); if(!a) return; window.handleAdminAnnounce(a); });
+  onValue(coinRef,(snap)=>{ const g=snap.val(); if(!g) return; window.handleCoinGift(g); });
+  onValue(partyRef,(snap)=>{ const p=snap.val(); if(!p) return; window.handleUpdateParty(p); });
+  onValue(supernovaRef,(snap)=>{ const s=snap.val(); if(!s) return; window.handleSupernova(s); });
+  onValue(rayaRef,(snap)=>{ const r=snap.val(); if(!r){return;} window.handleRayaEvent(r); });
+  onValue(halloweenRef,(snap)=>{ const h=snap.val(); if(!h) return; window.handleHalloween(h); });
+  onValue(updateRef,(snap)=>{ const u=snap.val(); if(!u) return; if(Date.now() - u.version < 10000){ if(confirm(`🔄 ATUALIZAÇÃO do dono ${u.by}! Recarregar?`)) location.reload(); } });
+  onValue(wipeRef,(snap)=>{ const w=snap.val(); if(!w) return; let lastWipe=parseInt(localStorage.getItem('HERO_LAST_WIPE')||'0'); if(w.version>lastWipe){ localStorage.setItem('HERO_LAST_WIPE', w.version); alert(`☠️ ${w.byName||w.by} zerou o save!`); localStorage.removeItem('HERO_V17'); location.reload(); } });
+}catch(e){}
+window.firebaseReady=firebaseReady; window.rankingRef=rankingRef; window.firebaseOps={push,onValue,query,orderByChild,limitToLast,ref};
+if(firebaseReady){
+  const q=query(rankingRef,orderByChild('coins'),limitToLast(30));
+  onValue(q,(snap)=>{
+    const data=snap.val(); if(!data){ document.getElementById('rankingList').innerHTML='<small>Sem recorde</small>'; return; }
+    let list=Object.values(data).sort((a,b)=>(b.coins||0)-(a.coins||0)); let unique=[]; let seen=new Set();
+    for(let p of list){ if(!seen.has(p.name)){ seen.add(p.name); unique.push(p); } if(unique.length>=3) break; } list=unique;
+    let html=''; list.forEach((p,i)=>{ let cls=i==0?'rank1':i==1?'rank2':'rank3'; let medal=i==0?'🥇':i==1?'🥈':'🥉'; html+=`<div class="${cls}">${medal} ${i+1}º ${p.name} - ${(p.coins||0).toLocaleString()} 💰</div>`; });
+    document.getElementById('rankingList').innerHTML=html; window.globalTop3=list;
+    if(document.getElementById('rankingListTab')) document.getElementById('rankingListTab').innerHTML=html;
+  });
+}
+</script><script>
+let audioCtx; function initA(){ if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }
+function pop(){initA();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=750;g.gain.setValueAtTime(0.15,audioCtx.currentTime);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.08);}
+function buySound(){initA();[0,0.1].forEach(d=>{let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=500+d*600;g.gain.setValueAtTime(0.3,audioCtx.currentTime+d);o.connect(g);g.connect(audioCtx.destination);o.start(audioCtx.currentTime+d);o.stop(audioCtx.currentTime+d+0.15);});}
+function crackSound(){initA();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=180;o.type='square';g.gain.setValueAtTime(0.5,audioCtx.currentTime);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.3);}
+let hasInteracted=false, isMusicMuted=false, isEventMusicActive=false, isRayaBaladaActive=false, isHalloweenActive=false;
+function getMetamorfose(){return document.getElementById('bgMusic0');}function getRaya(){return document.getElementById('bgMusic1');}function getHalloween(){return document.getElementById('bgMusic2');}
+function initMusic(){let m=getMetamorfose(),r=getRaya(),h=getHalloween(); if(m){m.volume=0.3; m.loop=true;} if(r){r.volume=0.35; r.loop=true;} if(h){h.volume=0.4; h.loop=true;}}
+function playMetamorfose(){let m=getMetamorfose(),r=getRaya(),h=getHalloween(); if(!m||isMusicMuted) return; if(r) r.pause(); if(h) h.pause(); m.play().catch(()=>{});}
+function playRaya(){let m=getMetamorfose(),r=getRaya(),h=getHalloween(); if(!r||isMusicMuted) return; if(m) m.pause(); if(h) h.pause(); r.currentTime=0; r.play().catch(()=>{});}
+function playHalloween(){let m=getMetamorfose(),r=getRaya(),h=getHalloween(); if(!h||isMusicMuted) return; if(m) m.pause(); if(r) r.pause(); h.currentTime=0; h.play().catch(()=>{});}
+function startMusicOnFirstClick(){if(hasInteracted) return; hasInteracted=true; initMusic(); if(isHalloweenActive) playHalloween(); else if(isEventMusicActive||isRayaBaladaActive) playRaya(); else playMetamorfose();}
+function toggleMusic(){isMusicMuted=!isMusicMuted; let m=getMetamorfose(), r=getRaya(), h=getHalloween(); if(isMusicMuted){ if(m) m.pause(); if(r) r.pause(); if(h) h.pause(); $('musicBtn').innerText='🔇 Música OFF';} else { if(hasInteracted){ if(isHalloweenActive) playHalloween(); else if(isEventMusicActive||isRayaBaladaActive) playRaya(); else playMetamorfose();} $('musicBtn').innerText='🔊 Música ON';}}
+initMusic();
+
+// === COZINHA ===
+let ingredientes = JSON.parse(localStorage.getItem('HERO_ING')||'{"carne":0,"tomate":0,"ervas":0,"queijo":0,"pimenta":0,"brasa":0}');
+let comidasFeitas = JSON.parse(localStorage.getItem('HERO_FOOD')||'{"bife":0,"ensopado":0,"burguer":0,"infernal":0,"feijoada":0,"banquete":0}');
+let kitchenGameActive=false, kitchenTimer=null, kitchenSpawn=null, kitchenTimeLeft=30, kitchenCollected=0;
+const ING_LIST=[{id:'carne',emoji:'🥩',chance:35},{id:'tomate',emoji:'🍅',chance:25},{id:'ervas',emoji:'🌿',chance:20},{id:'queijo',emoji:'🧀',chance:12},{id:'pimenta',emoji:'🌶️',chance:6},{id:'brasa',emoji:'🔥',chance:2}];
+const COMIDAS=[{id:'bife',name:'Bife Grelhado',emoji:'🍖',bonus:2.5,need:{carne:3},desc:'3x 🥩'},{id:'ensopado',name:'Ensopado',emoji:'🥘',bonus:5,need:{carne:2,tomate:2,ervas:1},desc:'2🥩 2🍅 1🌿'},{id:'burguer',name:'Burguer Monstro',emoji:'🍔',bonus:10,need:{carne:3,tomate:1,queijo:1,ervas:1},desc:'3🥩 1🍅 1🧀 1🌿'},{id:'infernal',name:'Carne Infernal',emoji:'🌶️🍖',bonus:18,need:{carne:4,pimenta:2,ervas:2},desc:'4🥩 2🌶️ 2🌿'},{id:'feijoada',name:'Feijoada Lendária',emoji:'🍲',bonus:35,need:{carne:5,tomate:3,queijo:2,ervas:2,brasa:1},desc:'5🥩 3🍅 2🧀 2🌿 1🔥'},{id:'banquete',name:'Banquete Supremo',emoji:'👑',bonus:75,need:{carne:10,tomate:5,ervas:5,queijo:3,pimenta:3,brasa:2},desc:'10🥩 5🍅 5🌿 3🧀 3🌶️ 2🔥'}];
+function saveKitchen(){ localStorage.setItem('HERO_ING', JSON.stringify(ingredientes)); localStorage.setItem('HERO_FOOD', JSON.stringify(comidasFeitas)); }
+function startKitchenGame(){ kitchenGameActive=true; kitchenTimeLeft=30; kitchenCollected=0; $('kitchenGame').classList.add('show'); $('kitchenArea').innerHTML=''; $('kitchenScore').innerText='0 coletados'; $('kitchenTimer').innerText='30s'; kitchenTimer=setInterval(()=>{ kitchenTimeLeft--; $('kitchenTimer').innerText=kitchenTimeLeft+'s'; if(kitchenTimeLeft<=0) stopKitchenGame(); },1000); kitchenSpawn=setInterval(spawnIngrediente, 180); }
+function stopKitchenGame(){ kitchenGameActive=false; clearInterval(kitchenTimer); clearInterval(kitchenSpawn); $('kitchenGame').classList.remove('show'); $('kitchenArea').innerHTML=''; saveKitchen(); render(); }
+function spawnIngrediente(){ if(!kitchenGameActive) return; let roll=Math.random()*100, acc=0, chosen=ING_LIST[0]; for(let ing of ING_LIST){ acc+=ing.chance; if(roll<=acc){ chosen=ing; break; } } let el=document.createElement('div'); el.className='ingItem'; el.innerText=chosen.emoji; el.style.left=Math.random()*85+'%'; el.style.fontSize=(26+Math.random()*14)+'px'; el.onclick=()=>{ ingredientes[chosen.id]++; kitchenCollected++; $('kitchenScore').innerText=kitchenCollected+' coletados'; saveKitchen(); el.remove(); pop(); }; $('kitchenArea').appendChild(el); setTimeout(()=>{ if(el.parentNode) el.remove(); },1500); }
+function cozinharComida(foodId){ let food=COMIDAS.find(f=>f.id==foodId); for(let k in food.need){ if((ingredientes[k]||0) < food.need[k]) return alert('Falta ingrediente! '+food.desc); } for(let k in food.need){ ingredientes[k]-=food.need[k]; } comidasFeitas[foodId]=(comidasFeitas[foodId]||0)+1; saveKitchen(); buySound(); render(); }
+function alimentarPetComComida(petId, foodId){ let pet=pets.find(p=>p.id==petId); if(!pet) return; let maxFeed=100 + (enchantLevels.gula||0)*10; if((pet.feedCount||0)>=maxFeed) return alert('MAX '+maxFeed+'/ feed!'); if((comidasFeitas[foodId]||0)<=0) return alert('Sem comida!'); let food=COMIDAS.find(f=>f.id==foodId); comidasFeitas[foodId]--; pet.mult+=food.bonus; pet.feedCount=(pet.feedCount||0)+1; pet.level=(pet.level||1)+1; saveKitchen(); buySound(); render(); }
+
+// === CONQUISTAS ===
+let conquistasDesbloqueadas = JSON.parse(localStorage.getItem('HERO_ACH')||'[]');
+const ACH_LIST=[
+{id:'c1',name:'Primeiro Clique',desc:'1 clique',check:()=>totalClicks>=1,reward:'100 💰',give:()=>coins+=100,icon:'👆'},
+{id:'c2',name:'Viciado',desc:'1.000 cliques',check:()=>totalClicks>=1000,reward:'5k 💰',give:()=>coins+=5000,icon:'🔥'},
+{id:'c3',name:'Dedo de Aço',desc:'10.000 cliques',check:()=>totalClicks>=10000,reward:'50k 💰 + 5 🔵',give:()=>{coins+=50000; cyberPoints+=5},icon:'💪'},
+{id:'c4',name:'Colecionador',desc:'10 pets',check:()=>pets.length>=10,reward:'Ovo Épico',give:()=>{},icon:'📦'},
+{id:'c5',name:'Zoológico',desc:'50 pets',check:()=>pets.length>=50,reward:'10 🔵',give:()=>cyberPoints+=10,icon:'🦁'},
+{id:'c6',name:'Milionário',desc:'1M moedas',check:()=>coins>=1000000,reward:'100k 💰',give:()=>coins+=100000,icon:'💰'},
+{id:'c7',name:'Chef Iniciante',desc:'Coletar 50 ingredientes',check:()=>Object.values(ingredientes).reduce((a,b)=>a+b,0)>=50,reward:'1 🔥',give:()=>ingredientes.brasa+=1,icon:'🍳'},
+{id:'c8',name:'Master Chef',desc:'Cozinhar 10 comidas',check:()=>Object.values(comidasFeitas).reduce((a,b)=>a+b,0)>=10,reward:'2 🧀',give:()=>ingredientes.queijo+=2,icon:'👨‍🍳'},
+{id:'c9',name:'Fusão é Vida',desc:'10 fusões',check:()=>(parseInt(localStorage.getItem('HERO_FUSIONS')||'0')>=10),reward:'100k',give:()=>coins+=100000,icon:'⚙️'},
+{id:'c10',name:'Top 3 Global',desc:'Entrar no rank',check:()=>bestGlobalSaved>0,reward:'50 🔵',give:()=>cyberPoints+=50,icon:'🏆'},
+{id:'c11',name:'Bilionario',desc:'1B moedas',check:()=>coins>=1000000000,reward:'500k',give:()=>coins+=500000,icon:'💎'},
+{id:'c12',name:'Quadeiro',desc:'1 QUAD',check:()=>coins>=1000000000000000,reward:'Roleta Grátis',give:()=>{spinFree=true},icon:'👑'},
+];
+let spinFree=false;
+function checkAchievements(){
+  ACH_LIST.forEach(ach=>{
+    if(!conquistasDesbloqueadas.includes(ach.id) && ach.check()){
+      conquistasDesbloqueadas.push(ach.id);
+      ach.give();
+      localStorage.setItem('HERO_ACH', JSON.stringify(conquistasDesbloqueadas));
+      let b=$('adminAnnounce'); b.innerText=`🏆 CONQUISTA: ${ach.icon} ${ach.name} +${ach.reward}!`; b.style.display='block'; setTimeout(()=>b.style.display='none',4000); buySound();
+    }
+  });
+}
+
+// === ENCANTAMENTOS ===
+let enchantLevels = JSON.parse(localStorage.getItem('HERO_ENCH')||'{"mao":0,"cursor":0,"chef":0,"midas":0,"fusao":0,"aura":0,"void":0,"tempo":0,"gula":0}');
+const ENCHANTS=[
+{id:'mao',name:'Mão Leve',emoji:'✋',rarity:'common',desc:'+5% moedas por nível',max:5,chance:30},
+{id:'cursor',name:'Cursor Afiado',emoji:'🖱️',rarity:'rare',desc:'+20% cps por nível',max:5,chance:20},
+{id:'chef',name:'Chef Sortudo',emoji:'🍳',rarity:'rare',desc:'+10% Brasa no minigame',max:5,chance:15},
+{id:'midas',name:'Toque de Midas',emoji:'💰',rarity:'legendary',desc:'10% chance 2x por nível',max:5,chance:7},
+{id:'fusao',name:'Fusão Perfeita',emoji:'⚙️',rarity:'legendary',desc:'+5% raridade acima',max:5,chance:5},
+{id:'aura',name:'Aura Potente',emoji:'💫',rarity:'legendary',desc:'+10% aura por nível',max:5,chance:5},
+{id:'void',name:'Benção do Void',emoji:'👁️',rarity:'mythic',desc:'Pets x1.2 por nível',max:5,chance:1.5},
+{id:'tempo',name:'Tempo Congelado',emoji:'❄️',rarity:'mythic',desc:'-10% cooldown fusão',max:5,chance:1},
+{id:'gula',name:'Gula Infinita',emoji:'👑',rarity:'mythic',desc:'+10 feeds limite por nível',max:5,chance:0.5}
+];
+function getEnchantBonus(){
+  let coinBonus=1 + (enchantLevels.mao||0)*0.05 + (enchantLevels.aura||0)*0.10;
+  let cursorBonus=1 + (enchantLevels.cursor||0)*0.20;
+  let petBonus=1 + (enchantLevels.void||0)*0.20;
+  return {coinBonus,cursorBonus,petBonus};
+}
+function spinEnchant(){
+  const QUAD=1000000000000000;
+  if(!spinFree && coins < QUAD){ return alert('Precisa 1 QUAD (1.000.000.000.000.000) pra girar!'); }
+  if(!spinFree) coins-=QUAD; spinFree=false;
+  $('enchantModal').classList.add('show');
+  $('roulette').classList.remove('stop');
+  $('enchantResult').innerText='Girando...';
+  setTimeout(()=>{
+    let roll=Math.random()*100, acc=0, chosen=null;
+    let shuffled=[...ENCHANTS].sort(()=>Math.random()-0.5);
+    for(let e of ENCHANTS){ acc+=e.chance; if(roll<=acc){ chosen=e; break; } }
+    if(!chosen) chosen=ENCHANTS[0];
+    if((enchantLevels[chosen.id]||0)>=chosen.max){ // se max, tenta outro
+      chosen=ENCHANTS.find(en=>(enchantLevels[en.id]||0)<en.max) || chosen;
+    }
+    enchantLevels[chosen.id]=(enchantLevels[chosen.id]||0)+1;
+    if(enchantLevels[chosen.id]>chosen.max) enchantLevels[chosen.id]=chosen.max;
+    localStorage.setItem('HERO_ENCH', JSON.stringify(enchantLevels));
+    $('roulette').classList.add('stop');
+    $('roulette').innerText=chosen.emoji;
+    $('enchantResult').innerHTML=`<span style="color:${chosen.rarity=='mythic'?'gold':chosen.rarity=='legendary'?'#a855f7':chosen.rarity=='rare'?'#00aaff':'#fff'}">${chosen.rarity.toUpperCase()}</span><br>${chosen.emoji} ${chosen.name} Lv${enchantLevels[chosen.id]}<br><small>${chosen.desc}</small>`;
+    buySound(); render(); save();
+  },1200);
+}
+
+let coins=0,aura='none',ownedAuras=['none'],pets=[],equippedPet=null,totalClicks=0,playerNameLocal=localStorage.getItem('HERO_NAME')||'';
+let activeBoost=null, boostTimer=0, boostInterval=null, cooldowns={energetico:0,furia:0,god:0};
+let cyberPoints=0, eventClicks=0, isCyberEvent=false, eventProgress=0;
+let bestGlobalSaved=parseInt(localStorage.getItem('HERO_BEST_GLOBAL')||'0');
+let adminMult=1, adminEventName='', adminEndTime=0, adminTimer=null, lastCoinTime=0, lastPartyTime=0, lastSupernovaTime=0, lastHalloweenTime=0;
+let cursorLevel=0; let supernovaActive=false, supernovaEnd=0, supernovaTimer=null; let halloweenEnd=0, halloweenTimer=null;
+let fusionSelected=[], fusionEggs=[], lastFusion=0;
+let ownedSkins=['default'], equippedBtnSkin='default';
+const SKINS_BTN=[
+{id:'default',name:'Padrão Verde',bonus:0,price:0,preview:'#00ff88',desc:'Padrão',emoji:'🟢'},
+{id:'dourada',name:'Skin Dourada ✨',bonus:0.10,price:20000,preview:'linear-gradient(45deg,#ffeb7a,gold)',desc:'+10% moedas',emoji:'🟡'},
+{id:'gelo',name:'Skin Gelo ❄️',bonus:0.10,price:500000,preview:'linear-gradient(45deg,#aaffff,#00aaff)',desc:'+10% moedas',emoji:'❄️'},
+{id:'fogo',name:'Skin Fogo 🔥',bonus:0.10,price:100000000,preview:'linear-gradient(45deg,#ffaa00,#ff0000)',desc:'+10% moedas',emoji:'🔥'},
+{id:'void',name:'Skin Void 👁️',bonus:0.10,price:40000000000000,preview:'linear-gradient(45deg,#d080ff,#000)',desc:'+10% moedas',emoji:'👁️'},
+{id:'cosmica',name:'Skin Cósmica 🌌',bonus:0.10,price:1500000000000000,preview:'linear-gradient(45deg,#ff00ff,#00ffff,#ffff00)',desc:'+10% moedas',emoji:'🌌'}
+];
+const FUSION_TABLE={
+common:[{name:'Porco',emoji:'🐖',base:1,chance:40,rarity:'common',value:200},{name:'Macaco',emoji:'🐒',base:1.5,chance:45,rarity:'common',value:300},{name:'Golem de Sucata',emoji:'🗿',base:4,chance:15,rarity:'rare',value:1200}],
+rare:[{name:'Vaca',emoji:'🐄',base:2,chance:50,rarity:'rare',value:600},{name:'Urso',emoji:'🐻',base:3,chance:40,rarity:'rare',value:900},{name:'Kitsune Dourada',emoji:'🦊',base:5,chance:10,rarity:'epic',value:4000}],
+epic:[{name:'Tigre',emoji:'🐯',base:5,chance:60,rarity:'epic',value:4000},{name:'Águia',emoji:'🦅',base:6.5,chance:35,rarity:'epic',value:7000},{name:'Leviatã',emoji:'🌊',base:13,chance:5,rarity:'epic',value:25000}],
+legendary:[{name:'Leão',emoji:'🦁',base:10,chance:70,rarity:'legendary',value:25000},{name:'Morcego',emoji:'🦇',base:12,chance:29,rarity:'legendary',value:40000},{name:'Olho do Olimpo',emoji:'👁️',base:18,chance:1,rarity:'legendary',value:120000}],
+mythic:[{name:'Luar',emoji:'🌕',base:16,chance:89,rarity:'mythic',value:120000},{name:'Kraken',emoji:'🐙',base:20,chance:10,rarity:'mythic',value:200000},{name:'Singularidade',emoji:'🌌',base:35,chance:1,rarity:'mythic',value:500000}]
+};
+const ULTRA_RECIPES=[
+{id:'la-vision',name:'La Vision',emoji:'👁️',base:50,need:['Void Pet','Olho do Olimpo','Singularidade']},
+{id:'la-fusion',name:'La Fusion',emoji:'💀',base:55,need:['La Vision','Sol Pet','Leviatã']},
+{id:'la-grande',name:'La Grande',emoji:'☠️',base:100,need:['La Vision','Fênix','Leviatã']}
+];
+const HALLOWEEN_PETS=[
+{name:'Et-pet',emoji:'👽',base:7,rarity:'epic',value:5000000000000,chance:70},
+{name:'Fantasma',emoji:'👻',base:10,rarity:'legendary',value:20000000000000,chance:29},
+{name:'Abóbora',emoji:'🎃',base:50,rarity:'mythic',value:100000000000000,chance:1}
+];
+const $=id=>document.getElementById(id);
+const AURAS=[{id:'none',name:'Sem Aura',mult:1,price:0,effect:'none'},{id:'cinza',name:'Aura Cinza',mult:2,price:2000,effect:'cinza'},{id:'azul',name:'Aura Azul',mult:4,price:15000,effect:'azul'},{id:'fogo',name:'Aura Fogo',mult:8,price:80000,effect:'fogo'},{id:'gelo',name:'Aura Gelo',mult:15,price:350000,effect:'gelo'},{id:'void',name:'Aura Void',mult:30,price:1500000,effect:'void'},{id:'estelar',name:'Aura Estelar',mult:70,price:5000000,effect:'estelar'},{id:'cosmica',name:'Aura Cósmica',mult:150,price:20000000,effect:'cosmica'},{id:'cyber',name:'Aura Cyber',mult:300,price:0,effect:'cyber',cyberPrice:170,isCyber:true},{id:'supernova',name:'Aura Supernova ☀️',mult:300,price:1000000000000,effect:'supernova',isSupernova:true},{id:'halloween',name:'Aura Halloween 🎃',mult:400,price:5000000000000000,effect:'halloween',isHalloween:true}];
+const HELPERS=[{id:'energetico', name:'⚡ Energético', price:250, mult:2, time:15, cd:30, desc:'2x por 15s'},{id:'furia', name:'🔥 Fúria', price:1000, mult:5, time:12, cd:120, desc:'5x por 12s'},{id:'god', name:'🌟 God Mode', price:5000, mult:10, time:10, cd:360, desc:'10x por 10s'}];
+const CURSORS=[
+{level:1,name:'🖱️ Cursor Lv1',cps:1,price:3000},
+{level:2,name:'🖱️ Cursor Lv2',cps:2,price:50000},
+{level:3,name:'🖱️ Cursor Lv3',cps:4,price:300000},
+{level:4,name:'🖱️ Cursor Lv4',cps:6,price:1000000},
+{level:5,name:'🖱️ Cursor Lv5',cps:8,price:20000000},
+{level:6,name:'🖱️ Cursor Lv6',cps:10,price:900000000},
+{level:7,name:'🖱️ Cursor Lv7',cps:12,price:1500000000},
+{level:8,name:'🖱️ Cursor Lv8',cps:15,price:10000000000},
+{level:9,name:'🖱️ Cursor Lv9',cps:30,price:300000000000},
+{level:10,name:'🖱️ Cursor Lv10',cps:45,price:950000000000},
+{level:11,name:'👨‍🍳 Cursor Chef Lv11',cps:70,price:5000000000000},
+{level:12,name:'👨‍🍳 Cursor Chef Lv12',cps:110,price:20000000000000},
+{level:13,name:'🔥 Cursor Fogo Lv13',cps:180,price:80000000000000},
+{level:14,name:'🔥 Cursor Fogo Lv14',cps:300,price:300000000000000},
+{level:15,name:'👁️ Cursor Void Lv15',cps:500,price:1000000000000000},
+{level:16,name:'👁️ Cursor Void Lv16',cps:800,price:3000000000000000},
+{level:17,name:'🌌 Cursor Cosmic Lv17',cps:1300,price:8000000000000000},
+{level:18,name:'🌌 Cursor Cosmic Lv18',cps:2000,price:20000000000000000},
+{level:19,name:'👑 Cursor Supremo Lv19',cps:3500,price:50000000000000000},
+{level:20,name:'👑 Cursor Supremo Lv20',cps:6000,price:150000000000000000}
+];
+const PETS_POOL=[{name:'Gato',rarity:'common',base:1.2,value:100,emoji:'🐱'},{name:'Cachorro',rarity:'common',base:1.3,value:150,emoji:'🐶'},{name:'Coelho',rarity:'rare',base:1.8,value:600,emoji:'🐰'},{name:'Raposa',rarity:'rare',base:2.2,value:900,emoji:'🦊'},{name:'Dragão Baby',rarity:'epic',base:3.5,value:4000,emoji:'🐲'},{name:'Fênix',rarity:'epic',base:5,value:7000,emoji:'🔥🦅'},{name:'Unicórnio',rarity:'legendary',base:9,value:25000,emoji:'🦄'},{name:'Void Pet',rarity:'mythic',base:18,value:120000,emoji:'👁️'}];
+const CYBER_PETS=[{name:'Dragão',rarity:'epic',base:7,value:5000,emoji:'🐲',chance:50},{name:'Serpente Cyber',rarity:'legendary',base:15,value:20000,emoji:'🐍',chance:45},{name:'Dragão Cósmico',rarity:'mythic',base:30,value:150000,emoji:'🌌🐉',isCustom:true,chance:5}];
+const SUPERNOVA_PETS=[{name:'Escorpião',rarity:'epic',base:15,value:50000000000,emoji:'🦂',chance:90},{name:'Sol Pet',rarity:'legendary',base:20,value:100000000000,emoji:'☀️',chance:9.9},{name:'Fênix',rarity:'mythic',base:60,value:500000000000,emoji:'🐦‍🔥',chance:0.1}];
+const EGGS=[{id:'basic',name:'🥚 Ovo Básico',price:500,pool:['common','rare'],list:'🐱 40% 🐶 35% 🐰 15% 🦊 10%'},{id:'epic',name:'💜 Ovo Épico',price:40000,pool:['rare','epic','legendary'],list:'🐰 🦊 🐲 Fênix 🦄 10%'},{id:'mythic',name:'🌟 Ovo Mítico',price:600000,pool:['epic','legendary','mythic'],list:'🐲 Fênix 🦄 👁️ 8%'}];
+window.handleRayaEvent=function(r){ if(!r) return; if(isHalloweenActive) return; if(r.active){ isRayaBaladaActive=true; isEventMusicActive=true; document.body.classList.add('balada'); $('rayaBanner').style.display='block'; $('rayaBanner').innerHTML=`<div class="rayaBanner">🎵 RAYA TOCANDO - MODO BALADA ATIVO 🪩</div>`; if(hasInteracted &&!isMusicMuted) playRaya(); } else { isRayaBaladaActive=false; isEventMusicActive=false; document.body.classList.remove('balada'); $('rayaBanner').style.display='none'; let rr=getRaya(); if(rr) rr.pause(); if(hasInteracted &&!isMusicMuted &&!isHalloweenActive) playMetamorfose(); } render(); };
+window.handleHalloween=function(h){ if(!h) return; if(h.active && Date.now()-h.startedAt < h.duration*1000){ lastHalloweenTime=h.startedAt; isHalloweenActive=true; halloweenEnd=h.startedAt+h.duration*1000; $('halloweenBanner').style.display='block'; $('halloweenBanner').innerHTML=`<div class="halloweenBanner">🎃 HALLOWEEN ATIVO! OVO SINISTRO 🕸️ 4 QUAD + AURA 5 QUAD!</div>`; if(hasInteracted &&!isMusicMuted) playHalloween(); if(halloweenTimer) clearInterval(halloweenTimer); halloweenTimer=setInterval(()=>{ let left=Math.max(0,Math.floor((halloweenEnd-Date.now())/1000)); $('halloweenBanner').innerHTML=`<div class="halloweenBanner">🎃 HALLOWEEN x50 | ${left}s | AURA 5 QUAD ATIVA!</div>`; if(left<=0){ clearInterval(halloweenTimer); isHalloweenActive=false; $('halloweenBanner').style.display='none'; let hh=getHalloween(); if(hh) hh.pause(); if(hasInteracted &&!isMusicMuted) playMetamorfose(); render(); } },1000); } else { isHalloweenActive=false; $('halloweenBanner').style.display='none'; if(halloweenTimer) clearInterval(halloweenTimer); let hh=getHalloween(); if(hh) hh.pause(); if(hasInteracted &&!isMusicMuted &&!isEventMusicActive &&!isRayaBaladaActive) playMetamorfose(); } render(); };
+window.handleAdminEvent=function(ev){ if(isRayaBaladaActive||isHalloweenActive) return; const isValid = ev && ev.mult!=1 && ev.name!='PARADO' && ev.name!='Nenhum'; if(!isValid){ if(isEventMusicActive &&!isRayaBaladaActive &&!isHalloweenActive){ isEventMusicActive=false; let r=getRaya(); if(r) r.pause(); if(hasInteracted &&!isMusicMuted) playMetamorfose(); } if(!supernovaActive){adminMult=1; adminEventName=''; $('adminEventBar').style.display='none'; $('globalInfo').innerText=''; if(adminTimer) clearInterval(adminTimer);} render(); return; } adminMult=ev.mult||1; adminEventName=ev.name||'EVENTO'; adminEndTime=(ev.startedAt||Date.now())+(ev.duration||60)*1000; let by=ev.byName||ev.by||'ADMIN'; $('adminEventBar').style.display='block'; $('globalInfo').innerText=`🌐 ${adminEventName} x${adminMult} por ${by}`; if(!isEventMusicActive &&!isRayaBaladaActive &&!isHalloweenActive){ isEventMusicActive=true; if(hasInteracted &&!isMusicMuted) playRaya(); } if(adminTimer) clearInterval(adminTimer); adminTimer=setInterval(()=>{let left=Math.max(0,Math.floor((adminEndTime-Date.now())/1000)); $('adminEventBar').innerText=`⚡ ${adminEventName} x${adminMult} | ${left}s | por ${by}`; if(left<=0){clearInterval(adminTimer); if(!isRayaBaladaActive &&!isHalloweenActive){isEventMusicActive=false; let r=getRaya(); if(r) r.pause(); if(hasInteracted &&!isMusicMuted) playMetamorfose();} if(!supernovaActive){$('adminEventBar').style.display='none'; adminMult=1; $('globalInfo').innerText='';} render();} render();},1000); render(); };
+window.handleAdminAnnounce=function(a){ if(!a||!a.text) return; let b=$('adminAnnounce'); b.innerText=`👑 ${a.byName||a.by}: ${a.text}`; b.style.display='block'; setTimeout(()=>b.style.display='none',5000); };
+window.handleCoinGift=function(g){ if(!g||!g.amount||g.amount<=0) return; if(Date.now() - (g.startedAt||0) > 12000) return; if(g.startedAt===lastCoinTime) return; lastCoinTime=g.startedAt; coins+=g.amount; buySound(); let b=$('adminAnnounce'); b.innerText=`💰 CHUVA! +${g.amount.toLocaleString()} moedas de ${g.byName||g.by}!`; b.style.display='block'; setTimeout(()=>b.style.display='none',5000); save(); render(); };
+window.handleUpdateParty=function(p){ if(!p||!p.startedAt) return; if(p.startedAt===lastPartyTime) return; lastPartyTime=p.startedAt; if(Date.now() - p.startedAt > p.duration*1000) return; for(let i=0;i<30;i++){setTimeout(()=>{let e=document.createElement('div'); e.className='confetti'; e.innerText=['🥳','🎊','🎉'][Math.floor(Math.random()*3)]; e.style.left=Math.random()*100+'vw'; e.style.animationDuration=(2+Math.random()*3)+'s'; e.style.fontSize=(20+Math.random()*20)+'px'; document.body.appendChild(e); setTimeout(()=>e.remove(),5000);}, i*120);} let b=$('adminAnnounce'); b.innerText=`🎉 UPDATE DE DOMINGO ATIVO! 🥳🎊🎉`; b.style.display='block'; setTimeout(()=>b.style.display='none',5000); };
+window.handleSupernova=function(s){ if(!s) return; if(s.startedAt===lastSupernovaTime &&!s.active) return; if(s.active && Date.now() - s.startedAt < s.duration*1000){ lastSupernovaTime=s.startedAt; supernovaActive=true; supernovaEnd=s.startedAt+s.duration*1000; $('supernovaBanner').style.display='block'; $('supernovaBanner').innerHTML=`<div class="supernovaBanner">☀️ SUPERNOVA ATIVA! Ovo 300B + Aura 1T por tempo limitado!</div>`; if(supernovaTimer) clearInterval(supernovaTimer); supernovaTimer=setInterval(()=>{let left=Math.max(0,Math.floor((supernovaEnd-Date.now())/1000)); $('supernovaBanner').innerHTML=`<div class="supernovaBanner">☀️ SUPERNOVA x300 | ${left}s restantes | OVO 300B NA LOJA!</div>`; if(left<=0){ clearInterval(supernovaTimer); supernovaActive=false; $('supernovaBanner').style.display='none'; render(); }},1000);} else {supernovaActive=false; $('supernovaBanner').style.display='none'; if(supernovaTimer) clearInterval(supernovaTimer);} render();};
+function save(){localStorage.setItem('HERO_V17',JSON.stringify({coins,aura,ownedAuras,pets,equippedPet,totalClicks,playerNameLocal,cooldowns,cyberPoints,eventClicks,cursorLevel,fusionEggs,lastFusion,ownedSkins,equippedBtnSkin,ingredientes,comidasFeitas,enchantLevels,conquistasDesbloqueadas}));}
+function load(){let d=localStorage.getItem('HERO_V17'); if(d){try{let j=JSON.parse(d);coins=j.coins||0;aura=j.aura||'none';ownedAuras=j.ownedAuras||['none'];pets=j.pets||[];equippedPet=j.equippedPet||null;totalClicks=j.totalClicks||0;playerNameLocal=j.playerNameLocal||localStorage.getItem('HERO_NAME')||'';cooldowns=j.cooldowns||{energetico:0,furia:0,god:0};cyberPoints=j.cyberPoints||0;eventClicks=j.eventClicks||0;cursorLevel=j.cursorLevel||0;fusionEggs=j.fusionEggs||[];lastFusion=j.lastFusion||0;ownedSkins=j.ownedSkins||['default'];equippedBtnSkin=j.equippedBtnSkin||'default'; if(j.ingredientes) ingredientes=j.ingredientes; if(j.comidasFeitas) comidasFeitas=j.comidasFeitas; if(j.enchantLevels) enchantLevels=j.enchantLevels; if(j.conquistasDesbloqueadas) conquistasDesbloqueadas=j.conquistasDesbloqueadas; pets.forEach(p=>{ if(p.feedCount===undefined) p.feedCount=0; });}catch(e){}}}
+load();
+function getSkinBonus(){ return 1 + (ownedSkins.length-1)*0.10; }
+function getTotalMult(){
+  let base=(AURAS.find(a=>a.id==aura)?.mult||1)*(pets.find(p=>p.id==equippedPet)?.mult||1);
+  if(activeBoost) base*=activeBoost.mult; base*=adminMult; if(isHalloweenActive) base*=2;
+  let ench=getEnchantBonus(); base*=ench.coinBonus; base*=ench.petBonus; base*=getSkinBonus();
+  if(enchantLevels.midas>0 && Math.random() < 0.10*enchantLevels.midas){ base*=2; }
+  return base;
+}
+function getCursorCPS(){ if(cursorLevel==0) return 0; let base=CURSORS.find(c=>c.level==cursorLevel)?.cps||0; let ench=getEnchantBonus(); return Math.floor(base*ench.cursorBonus); }
+function checkCyberEvent(){ let now=new Date(); let day=now.getDay(); let hour=now.getHours(); let minute=now.getMinutes(); if(day===4 && (hour>6 || (hour===6 && minute>=30))){ isCyberEvent=true; } else { isCyberEvent=false; } window.isCyberEvent=isCyberEvent; let banner=$('eventBanner'); if(isCyberEvent){ banner.style.display='block'; banner.innerHTML=`<div class="cyberBanner">🔵 EVENTO CYBER ATIVO! • ${eventProgress}/100 cliques = 1 Ponto</div>`; } else { banner.style.display='none'; } }
+setInterval(checkCyberEvent, 60000); checkCyberEvent();
+function render(){
+ let total=getTotalMult(); let cps=getCursorCPS(); let bonus=getSkinBonus(); let ench=getEnchantBonus();
+ $('coins').innerText=coins.toLocaleString()+' 💰'; $('cyberPoints').innerText=cyberPoints+' 🔵 CYBER';
+ $('level').innerText='x'+total.toFixed(1)+' • 🎨 +'+Math.round((bonus-1)*100)+'% • '+pets.length+' PETS'+(cps>0?' • 🖱️ '+cps+'/s':'')+(ench.coinBonus>1?' • ✨'+Math.round((ench.coinBonus-1)*100)+'%':'');
+ $('perClick').innerText=total.toFixed(1)+' 💰'; $('skinBonus').innerText=bonus>1?'+'+Math.round((bonus-1)*100)+'% SKINS':''; $('eventProgress').innerText=isCyberEvent?`🔵 ${eventProgress}/100`:''; $('petCount').innerText=pets.length+' PETS'; $('totalClicks').innerText=totalClicks.toLocaleString(); $('auraEl').className='aura '+(AURAS.find(a=>a.id==aura)?.effect||''); $('clickBtn').className='clickBtn skin-'+equippedBtnSkin; $('cursorInfo').innerText=cps>0?`🖱️ ${cps} cliques/s`:'';
+ if(activeBoost){ $('boostBanner').style.display='block'; $('boostBanner').innerHTML=`<div class="boostActive">⚡ ${activeBoost.name.toUpperCase()} x${activeBoost.mult} - ${boostTimer}s</div>`; } else { $('boostBanner').style.display='none'; }
+ let htmlAura=''; AURAS.forEach(a=>{ if(a.isCyber &&!a.isSupernova &&!a.isHalloween){} else if(a.isSupernova &&!supernovaActive &&!ownedAuras.includes('supernova')) return; let owned=ownedAuras.includes(a.id); let priceText = a.isCyber? `${a.cyberPrice} 🔵` : a.isSupernova? `1 TRILHÃO 💰` : a.isHalloween? `5 QUAD 💰` : `${a.price.toLocaleString()} 💰`; htmlAura+=`<div class="item"><div><b>${a.name} x${a.mult}</b><br><small>${priceText}</small></div><button onclick="buyAura('${a.id}')" style="padding:8px 12px;border-radius:10px;border:none;font-weight:bold;background:${aura==a.id?'#00ff88':owned?'#333':'#fff'}">${aura==a.id?'EQUIPADA':owned?'EQUIPAR':'COMPRAR'}</button></div>`; }); $('tabAura').innerHTML=htmlAura;
+ let htmlSkins=`<h4>🎨 SKINS DO BOTÃO - +10% cada</h4>`; SKINS_BTN.forEach(s=>{ let owned=ownedSkins.includes(s.id); let isEquipped=equippedBtnSkin==s.id; htmlSkins+=`<div class="item"><div style="display:flex;align-items:center"><span class="skinPreview" style="background:${s.preview}"></span><div><b>${s.emoji} ${s.name}</b></div></div><button onclick="buySkin('${s.id}')" style="padding:8px 12px;border-radius:10px;border:none;font-weight:bold;background:${isEquipped?'#ffcc00':owned?'#333':'#fff'}">${isEquipped?'EQUIPADA':owned?'EQUIPAR':'COMPRAR'}</button></div>`; }); $('tabSkins').innerHTML=htmlSkins;
+ let htmlCursor='<h4>🖱️ CURSORES até Lv20 - NOVO!</h4>'; CURSORS.forEach(c=>{ let isNext=c.level==cursorLevel+1; let isOwned=c.level<=cursorLevel; let canBuy=isNext && coins>=c.price; htmlCursor+=`<div class="item" style="${isNext?'border-color:#00ff88':''}"><div><b>${c.name} ${c.cps}x/s</b><br><small>${c.price>=1e15? (c.price/1e15).toFixed(1)+' QUAD':c.price.toLocaleString()} 💰</small></div><button onclick="buyCursor(${c.level})" style="padding:8px 12px;border-radius:10px;border:none;font-weight:bold;background:${isOwned?'#333':canBuy?'#00ff88':'#222'}" ${isOwned||!isNext?'disabled':''}>${isOwned?'COMPRADO':isNext?(canBuy?'COMPRAR':'SEM GRANA'):'🔒'}</button></div>`; }); $('tabCursor').innerHTML=htmlCursor;
+ let htmlP=''; if(supernovaActive){ htmlP+=`<div class="item" style="border:2px solid #ffaa00"><div><b>☀️ OVO SUPERNOVA</b></div><button onclick="buySupernovaEgg()" style="padding:8px 12px;border-radius:10px;background:linear-gradient(90deg,#ffff00,#ff6600);font-weight:bold">CHOCAR 300B</button></div>`; } if(isHalloweenActive){ htmlP+=`<div class="item" style="border:2px solid #ff6600"><div><b>🕸️ OVO SINISTRO</b></div><button onclick="buyHalloweenEgg()" style="padding:8px 12px;border-radius:10px;background:#ff6600;color:#fff">CHOCAR 4Q</button></div>`; } EGGS.forEach(egg=>{htmlP+=`<div class="item"><div><b>${egg.name}</b><br><small>${egg.price.toLocaleString()} 💰</small></div><button onclick="buyEgg('${egg.id}')" style="padding:8px 12px;border-radius:10px;background:${egg.id=='basic'?'#fff':egg.id=='epic'?'#a000ff':'gold'};font-weight:bold">CHOCAR</button></div>`;}); htmlP+=`<div class="kitchenBar"><div><b>🍳 COMIDAS</b><br><small>${COMIDAS.map(f=>`${f.emoji} ${comidasFeitas[f.id]||0}`).join(' | ')}</small></div><button onclick="openTab('kitchen')" style="padding:8px 12px;border-radius:10px;background:#00ff88;color:#000;font-weight:900">COZINHA</button></div>`; htmlP+=`<h4>📦 Meus PETS (${pets.length})</h4>`; if(pets.length==0) htmlP+='<small>Sem PETS</small>'; else pets.slice().reverse().forEach(p=>{ let maxFeed=100+(enchantLevels.gula||0)*10; let feedCount=p.feedCount||0; let isMax=feedCount>=maxFeed; htmlP+=`<div class="pet" style="${equippedPet==p.id?'border-color:#00ff88':''}"><div><span class="petEmoji">${p.emoji}</span> <b>${p.name}</b> <span class="rarity ${p.rarity}">${p.rarity}</span><br><small>x${p.mult.toFixed(1)} • ${feedCount}/${maxFeed}</small></div><div style="display:flex;flex-direction:column;gap:4px"><button onclick="equipPet('${p.id}')" style="padding:5px 8px;border-radius:8px;background:${equippedPet==p.id?'#00ff88':'#333'};color:${equippedPet==p.id?'#000':'#fff'};border:none;font-size:10px">${equippedPet==p.id?'EQUIPADO':'EQUIPAR'}</button>${isMax?`<small style="color:#ff4444">MAX ${maxFeed}</small>`:COMIDAS.map(f=> (comidasFeitas[f.id]>0? `<button onclick="alimentarPetComComida('${p.id}','${f.id}')" style="padding:4px 6px;border-radius:6px;background:#111;border:1px solid #333;color:#fff;font-size:8px">${f.emoji} +${f.bonus}</button>`:'')).join('')}</div></div>`; }); $('tabPets').innerHTML=htmlP;
+ let htmlK=`<div style="background:#111;padding:10px;border-radius:12px;margin-bottom:10px"><h4 style="margin:0">🎒 Ingredientes</h4><div style="font-size:13px;margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px"><div>🥩 ${ingredientes.carne}</div><div>🍅 ${ingredientes.tomate}</div><div>🌿 ${ingredientes.ervas}</div><div>🧀 ${ingredientes.queijo}</div><div>🌶️ ${ingredientes.pimenta}</div><div>🔥 ${ingredientes.brasa}</div></div><button onclick="startKitchenGame()" style="width:100%;margin-top:12px;padding:14px;background:linear-gradient(90deg,#00ff88,#00cc66);color:#000;border:none;border-radius:12px;font-weight:900">🎮 JOGAR - COLETAR (30s)</button></div><h4>🍳 Receitas</h4>`; COMIDAS.forEach(f=>{ let canCook=true; for(let k in f.need){ if((ingredientes[k]||0) < f.need[k]) canCook=false; } htmlK+=`<div class="item" style="${canCook?'border-color:#00ff88':''}"><div><b>${f.emoji} ${f.name} +${f.bonus}</b><br><small>${f.desc}</small></div><button onclick="cozinharComida('${f.id}')" style="padding:8px 12px;border-radius:10px;border:none;font-weight:900;background:${canCook?'#00ff88':'#333'}" ${canCook?'':'disabled'}>COZINHAR</button></div>`; }); $('tabKitchen').innerHTML=htmlK;
+ // CONQUISTAS
+ let htmlAch=`<h4>🏆 CONQUISTAS ${conquistasDesbloqueadas.length}/${ACH_LIST.length}</h4>`; ACH_LIST.forEach(a=>{ let unlocked=conquistasDesbloqueadas.includes(a.id); htmlAch+=`<div class="item achItem ${unlocked?'unlocked':''}"><div><b>${a.icon} ${a.name}</b><br><small>${a.desc} • ${a.reward}</small></div><div>${unlocked?'✅':'🔒'}</div></div>`; }); $('tabAch').innerHTML=htmlAch;
+ // ENCANTAMENTOS
+ let htmlEn=`<div style="background:linear-gradient(90deg,#1a0a2a,#2a0a4a);padding:12px;border-radius:12px;text-align:center;border:2px solid #a000ff"><h3 style="margin:0">✨ ROLETA DE ENCANTAMENTOS</h3><p style="font-size:11px">1 QUAD por giro • Míticos 3%</p><button onclick="spinEnchant()" style="width:100%;padding:14px;background:linear-gradient(90deg,gold,#ffaa00);color:#000;border:none;border-radius:12px;font-weight:900;font-size:14px">🎰 GIRAR - 1 QUAD</button><p style="font-size:10px;opacity:.6">Você tem: ${coins>=1e15?(coins/1e15).toFixed(2)+' QUAD':coins.toLocaleString()+' 💰'}</p></div><h4>Seus Encantamentos</h4>`; ENCHANTS.forEach(e=>{ let lv=enchantLevels[e.id]||0; htmlEn+=`<div class="item" style="${lv>0?'border-color:#a000ff':''}"><div><b>${e.emoji} ${e.name} Lv${lv}/${e.max}</b><br><small>${e.desc}</small><br><small style="color:${e.rarity=='mythic'?'gold':e.rarity=='legendary'?'#a855f7':e.rarity=='rare'?'#00aaff':'#888'}">${e.rarity}</small></div><div style="font-weight:900">${lv>0?'✨'+lv:''}</div></div>`; }); $('tabEnchant').innerHTML=htmlEn;
+
+ let htmlPick=''; pets.slice().reverse().forEach((p,idxRev)=>{ let realIdx=pets.length-1-idxRev; let sel=fusionSelected.includes(realIdx); htmlPick+=`<div class="pet" style="${sel?'border-color:#00ff88':''};cursor:pointer" onclick="toggleFusionSel(${realIdx})"><div><span class="petEmoji">${p.emoji}</span> <b>${p.name}</b> <span class="rarity ${p.rarity}">${p.rarity}</span></div><div>${sel?'✅':''}</div></div>`; }); if($('fusionPetsPick')) $('fusionPetsPick').innerHTML=htmlPick||'<small>Sem pets</small>';
+ if($('fusionSelected')) $('fusionSelected').innerText=fusionSelected.length+'/3'; let cd=Math.max(0,300000-(Date.now()-lastFusion)*(1 - (enchantLevels.tempo||0)*0.1)); if($('fusionCooldown')) $('fusionCooldown').innerText=cd>0?'⏳ '+Math.ceil(cd/1000)+'s':'✅ Pronta!'; if($('btnFusion')) $('btnFusion').disabled=cd>0;
+ let htmlU=''; ULTRA_RECIPES.forEach(u=>{ let has=u.need.every(need=>pets.some(p=>p.name.includes(need)||p.name==need)); htmlU+=`<div class="fusionBox"><div class="ultrapetRarity">${u.name} ${u.base}x</div><div style="font-size:10px;margin:6px 0">${u.need.join(' + ')}</div><button class="nbtn" style="background:${has?'#fff':'#333'}" ${has?'':'disabled'} onclick="craftUltra('${u.id}')">${has?'CRAFTAR':'FALTAM'}</button></div>`; }); if($('ultraList')) $('ultraList').innerHTML=htmlU;
+ let htmlEggs=''; fusionEggs.forEach(egg=>{ let left=Math.max(0,egg.end-Date.now()); let s=Math.ceil(left/1000); let ready=left<=0; htmlEggs+=`<div class="fusionBox"><span class="fusionEgg">${ready?'💥':'🍀'}</span><div><b>${egg.pet.emoji} ${egg.pet.name} x${egg.pet.base}</b><br><small>${ready?'PRONTO!':'Rachando... '+s+'s'}</small></div>${ready?`<button class="nbtn" style="background:#00ff88;color:#000;margin-top:6px" onclick="hatchFusion(${egg.id})">CHOCAR!</button>`:''}</div>`; }); if($('fusionEggs')) $('fusionEggs').innerHTML=htmlEggs||'<small>Nenhum ovo</small>';
+ let now=Date.now()/1000; let htmlHelp=`<h4>⚡ Boosts</h4>`; HELPERS.forEach(h=>{ let cdLeft = Math.max(0, Math.floor((cooldowns[h.id]||0) - now)); let canUse = cdLeft==0 &&!activeBoost; htmlHelp+=`<div class="item"><div><b>${h.name}</b> - x${h.mult}</div><button onclick="buyHelper('${h.id}')" style="padding:8px 12px;border-radius:10px;background:${canUse?'#ffde59':'#333'}" ${canUse?'':'disabled'}>${canUse?`ATIVAR - ${h.price}💰`:cdLeft>0?`${cdLeft}s`:'EM USO'}</button></div>`; }); $('tabHelpers').innerHTML=htmlHelp;
+ let htmlSell=`<h4>💰 Vender</h4>`; if(pets.length==0) htmlSell+='<small>Sem PETS</small>'; else pets.slice().reverse().forEach(p=>{ let sellVal=Math.floor(p.sellValue * p.mult); htmlSell+=`<div class="item"><div><b>${p.emoji} ${p.name}</b><br><small>x${p.mult.toFixed(1)} • ${sellVal.toLocaleString()}</small></div><button onclick="sellPet('${p.id}')" style="padding:8px 12px;border-radius:10px;background:#ff4444;color:#fff;border:none;font-weight:bold">VENDER</button></div>`; }); $('tabSell').innerHTML=htmlSell;
+ let htmlCyber=`<h4>🔵 LOJA CYBER</h4><div style="background:#1a1033;padding:8px;border-radius:8px;margin-bottom:10px;font-size:11px">Você tem: <b>${cyberPoints} 🔵</b></div>`; htmlCyber+=`<div class="item"><div><b>👾 Aura Cyber x300</b><br><small>170 🔵</small></div><button onclick="buyCyberAura()" style="padding:8px 12px;border-radius:10px;background:${ownedAuras.includes('cyber')?'#333':cyberPoints>=170?'#7c3aed':'#222'};color:#fff">COMPRAR</button></div>`; htmlCyber+=`<div class="item"><div><b>🥚 Cyber Egg 50 🔵</b></div><button onclick="buyCyberEgg()" style="padding:8px 12px;border-radius:10px;background:${cyberPoints>=50?'#06b6d4':'#222'}">CHOCAR</button></div>`; $('tabCyber').innerHTML=htmlCyber;
+ $('myPetsShort').innerHTML=`<span>📦 ${pets.length} | 🍳 ${Object.values(comidasFeitas).reduce((a,b)=>a+b,0)} | 🏆 ${conquistasDesbloqueadas.length}/${ACH_LIST.length} | ✨ Lv${Object.values(enchantLevels).reduce((a,b)=>a+b,0)}</span>`;
+ $('tabRank').innerHTML='<h4>🏆 RANK</h4><div id="rankingListTab"></div>'; checkAchievements(); save();
+}
+function openTab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.nbtn').forEach(e=>e.classList.remove('active'));let el=$('tab'+t.charAt(0).toUpperCase()+t.slice(1)); if(el) el.classList.add('active'); let btn=$('tabBtn'+t.charAt(0).toUpperCase()+t.slice(1)); if(btn) btn.classList.add('active');}
+function buySkin(id){ let s=SKINS_BTN.find(x=>x.id==id); if(ownedSkins.includes(id)){equippedBtnSkin=id;buySound();render();return;} if(coins < s.price){alert('Sem grana');return;} coins-=s.price; ownedSkins.push(id); equippedBtnSkin=id; buySound(); render(); }
+function buyAura(id){ let a=AURAS.find(x=>x.id==id); if(a.isCyber &&!ownedAuras.includes(id) && cyberPoints < a.cyberPrice){alert('Precisa '+a.cyberPrice+' 🔵'); return;} if(a.isSupernova &&!ownedAuras.includes(id) && coins < 1000000000000){alert('Precisa 1T'); return;} if(a.isHalloween &&!ownedAuras.includes(id) && coins < 5000000000000000){alert('Precisa 5Q'); return;} if(ownedAuras.includes(id)){aura=id;buySound();render();return;} if(a.isCyber){ cyberPoints-=a.cyberPrice; ownedAuras.push(id); aura=id; buySound(); render(); return; } if(a.isSupernova){ coins-=1000000000000; ownedAuras.push(id); aura=id; buySound(); render(); return; } if(a.isHalloween){ coins-=5000000000000000; ownedAuras.push(id); aura=id; buySound(); render(); return; } if(coins<a.price){alert('Sem grana!');return;}coins-=a.price;ownedAuras.push(id);aura=id;buySound();render(); }
+function buyCyberAura(){ if(ownedAuras.includes('cyber')){ aura='cyber'; buySound(); render(); return; } if(cyberPoints<170){ alert('Precisa 170 🔵'); return; } cyberPoints-=170; ownedAuras.push('cyber'); aura='cyber'; buySound(); render(); }
+function buyCursor(lv){ if(lv!=cursorLevel+1){alert('Compra em ordem!');return;} let c=CURSORS.find(x=>x.level==lv); if(coins<c.price){alert('Precisa '+c.price.toLocaleString());return;} coins-=c.price; cursorLevel=lv; buySound(); render(); }
+function buyEgg(type){ let egg=EGGS.find(e=>e.id==type);if(coins<egg.price){alert('Precisa '+egg.price.toLocaleString());return;} coins-=egg.price;let pool=PETS_POOL.filter(p=>egg.pool.includes(p.rarity));let chosen=pool[Math.floor(Math.random()*pool.length)]; if(type=='basic'){let r=Math.random();if(r<0.4) chosen=PETS_POOL[0];else if(r<0.75) chosen=PETS_POOL[1];else if(r<0.90) chosen=PETS_POOL[2];else chosen=PETS_POOL[3];} if(type=='epic'&&Math.random()<0.10) chosen=PETS_POOL.find(p=>p.rarity=='legendary'); if(type=='mythic'&&Math.random()<0.08) chosen=PETS_POOL.find(p=>p.rarity=='mythic'); let newPet={id:'pet_'+Date.now()+Math.random(),name:chosen.name,rarity:chosen.rarity,emoji:chosen.emoji,base:chosen.base,mult:chosen.base,level:1,feedCount:0,sellValue:chosen.value}; pets.push(newPet);if(!equippedPet) equippedPet=newPet.id;render();startHatchAnimation(newPet,type); }
+function buySupernovaEgg(){ if(!supernovaActive){alert('Evento Supernova não ativo!');return;} if(coins<300000000000){alert('Precisa 300B!');return;} coins-=300000000000; let r=Math.random()*100; let chosen; if(r<90) chosen=SUPERNOVA_PETS[0]; else if(r<99.9) chosen=SUPERNOVA_PETS[1]; else chosen=SUPERNOVA_PETS[2]; let newPet={id:'pet_'+Date.now()+Math.random(),name:chosen.name,rarity:chosen.rarity,emoji:chosen.emoji,base:chosen.base,mult:chosen.base,level:1,feedCount:0,sellValue:chosen.value,isSupernova:true}; pets.push(newPet); if(!equippedPet) equippedPet=newPet.id; render(); startHatchAnimation(newPet,'supernova');}
+function buyCyberEgg(){ if(cyberPoints<50){alert('Precisa 50 🔵');return;} cyberPoints-=50; let r=Math.random()*100; let chosen; if(r<50) chosen=CYBER_PETS[0]; else if(r<95) chosen=CYBER_PETS[1]; else chosen=CYBER_PETS[2]; let newPet={id:'pet_'+Date.now()+Math.random(),name:chosen.name,rarity:chosen.rarity,emoji:chosen.emoji,base:chosen.base,mult:chosen.base,level:1,feedCount:0,sellValue:chosen.value,isCyber:true}; pets.push(newPet);if(!equippedPet) equippedPet=newPet.id;render();startHatchAnimation(newPet,'cyber'); }
+function buyHalloweenEgg(){ if(!isHalloweenActive){alert('Halloween não ativo!');return;} if(coins<4000000000000000){alert('Precisa 4Q!');return;} coins-=4000000000000000; let r=Math.random()*100; let chosen; if(r<70) chosen=HALLOWEEN_PETS[0]; else if(r<99) chosen=HALLOWEEN_PETS[1]; else chosen=HALLOWEEN_PETS[2]; let newPet={id:'pet_'+Date.now()+Math.random(),name:chosen.name,rarity:chosen.rarity,emoji:chosen.emoji,base:chosen.base,mult:chosen.base,level:1,feedCount:0,sellValue:chosen.value,isHalloween:true}; pets.push(newPet); if(!equippedPet) equippedPet=newPet.id; render(); startHatchAnimation(newPet,'halloween'); }
+function startHatchAnimation(pet,eggType){ let modal=$('hatchModal'),eggEl=$('eggDisplay'),petEl=$('petReveal'),txt=$('hatchText'),rar=$('hatchRarity'),btnCont=$('btnContinue'),btnColl=$('btnCollect'); modal.classList.add('show');eggEl.style.display='block';eggEl.className='eggAnim shaking';eggEl.innerText=eggType=='basic'?'🥚':eggType=='epic'?'💜':eggType=='mythic'?'🌟':eggType=='cyber'?'🔵':eggType=='supernova'?'☀️':eggType=='halloween'?'🕸️':eggType=='fusion'?'🍀':eggType=='ultra'?'💫':'🥚'; petEl.classList.remove('show');petEl.style.display='none';txt.innerText='Chocando...';rar.innerHTML='';btnCont.style.display='none';btnColl.style.display='none';initA(); setTimeout(()=>{eggEl.classList.remove('shaking');eggEl.classList.add('cracking');crackSound();btnCont.style.display='block';txt.innerText='Rachou!';},1300); setTimeout(()=>{eggEl.style.display='none';petEl.innerText=pet.emoji;petEl.style.display='block';setTimeout(()=>petEl.classList.add('show'),50);txt.innerHTML=`${pet.emoji} <b>${pet.name}</b>!`;rar.innerHTML=`<span class="rarity ${pet.rarity}">${pet.rarity.toUpperCase()}</span>`;btnCont.style.display='none';btnColl.style.display='block';},2100); }
+function closeHatch(){$('hatchModal').classList.remove('show');}
+function equipPet(id){equippedPet=id;buySound();render();}
+function sellPet(id){ let pet=pets.find(p=>p.id==id); if(!pet) return; if(pets.length==1 && equippedPet==id){alert('Não pode vender único');return;} if(!confirm(`Vender ${pet.emoji} ${pet.name}?`)) return; coins+=Math.floor(pet.sellValue*pet.mult); pets=pets.filter(p=>p.id!=id); if(equippedPet==id) equippedPet=pets[0]?.id||null; buySound(); render(); }
+function buyHelper(id){ if(activeBoost){alert('Já tem boost ativo!');return;} let now=Date.now()/1000; let cdLeft=Math.max(0, Math.floor((cooldowns[id]||0)-now)); if(cdLeft>0){alert(`Cooldown: ${cdLeft}s`);return;} let h=HELPERS.find(x=>x.id==id); if(coins<h.price){alert('Sem grana!');return;} coins-=h.price; activeBoost=h; boostTimer=h.time; cooldowns[id]=now + h.cd; buySound(); render(); clearInterval(boostInterval); boostInterval=setInterval(()=>{ boostTimer--; if(boostTimer<=0){ clearInterval(boostInterval); activeBoost=null; render(); } },1000); }
+function resetSave(){ if(confirm('Zerar tudo?')){ localStorage.clear(); location.reload(); } }
+function checkGlobalRanking(){ if(!window.firebaseReady) return; let top3 = window.globalTop3||[]; let minTop = top3.length < 3? 0 : Math.min(...top3.map(r=>r.coins||0)); if(coins > minTop && coins > bestGlobalSaved && coins > 500){ if(playerNameLocal && playerNameLocal.length >= 2){ saveGlobalRanking(true); } else { $('nameModal').classList.add('show'); $('playerName').value = playerNameLocal||''; } } }
+async function saveGlobalRanking(isAuto=false){ let name = isAuto? playerNameLocal : ($('playerName').value.trim() || 'Jogador'); if(name.length<2) name='Jogador'; playerNameLocal=name; localStorage.setItem('HERO_NAME',name); bestGlobalSaved=coins; localStorage.setItem('HERO_BEST_GLOBAL',bestGlobalSaved); let data={name, coins:coins, clicks:totalClicks, mult:getTotalMult(), pets:pets.length, timestamp:Date.now()}; if(window.firebaseReady){ try{ await window.firebaseOps.push(window.rankingRef,data); if(!isAuto){ $('nameModal').classList.remove('show'); } }catch(e){} } else if(!isAuto){ $('nameModal').classList.remove('show'); } save(); render(); }
+function toggleFusionSel(idx){ if(fusionSelected.includes(idx)) fusionSelected=fusionSelected.filter(i=>i!=idx); else { if(fusionSelected.length>=3) return alert('Máximo 3'); fusionSelected.push(idx); } render(); }
+function doFusion(){ let baseCd=300000*(1 - (enchantLevels.tempo||0)*0.1); let cd=baseCd-(Date.now()-lastFusion); if(cd>0) return alert('Cooldown! '+Math.ceil(cd/1000)+'s'); if(fusionSelected.length!=3) return alert('Selecione 3!'); let r=pets[fusionSelected[0]].rarity; if(!fusionSelected.every(i=>pets[i].rarity==r)) return alert('Mesma raridade!'); let sorted=[...fusionSelected].sort((a,b)=>b-a); sorted.forEach(i=>pets.splice(i,1)); if(equippedPet &&!pets.find(p=>p.id==equippedPet)) equippedPet=pets[0]?.id||null; fusionSelected=[]; lastFusion=Date.now(); localStorage.setItem('HERO_FUSIONS', (parseInt(localStorage.getItem('HERO_FUSIONS')||'0')+1).toString()); let table=FUSION_TABLE[r]; if(!table) return alert('Sem fusão'); let roll=Math.random()*100, acc=0, chosen=table[0]; for(let it of table){ acc+=it.chance; if(roll<=acc){ chosen=it; break; } } if(enchantLevels.fusao>0 && Math.random()<0.05*enchantLevels.fusao){ let nextRarity={common:'rare',rare:'epic',epic:'legendary',legendary:'mythic',mythic:'mythic'}[r]; if(FUSION_TABLE[nextRarity]){ let nt=FUSION_TABLE[nextRarity]; chosen=nt[Math.floor(Math.random()*nt.length)]; } } let egg={id:Date.now(),rarity:r,pet:chosen,start:Date.now(),end:Date.now()+120000}; fusionEggs.push(egg); buySound(); render(); }
+function hatchFusion(id){ let egg=fusionEggs.find(e=>e.id==id); if(!egg) return; if(Date.now()<egg.end) return alert('Ainda rachando!'); let p=egg.pet; let newPet={id:'pet_'+Date.now()+Math.random(),name:p.name,rarity:p.rarity,emoji:p.emoji,base:p.base,mult:p.base,level:1,feedCount:0,sellValue:p.value,isFusion:true}; pets.push(newPet); if(!equippedPet) equippedPet=newPet.id; fusionEggs=fusionEggs.filter(e=>e.id!=id); render(); startHatchAnimation(newPet,'fusion'); }
+function craftUltra(id){ let rec=ULTRA_RECIPES.find(x=>x.id==id); let missing=rec.need.filter(need=>!pets.some(p=>p.name.includes(need)||p.name==need)); if(missing.length>0) return alert('Falta: '+missing.join(', ')); rec.need.forEach(need=>{ let idx=pets.findIndex(p=>p.name.includes(need)||p.name==need); if(idx>=0) pets.splice(idx,1); }); if(equippedPet &&!pets.find(p=>p.id==equippedPet)) equippedPet=pets[0]?.id||null; let newPet={id:'pet_'+Date.now()+Math.random(),name:rec.name,rarity:'ultrapet',emoji:rec.emoji,base:rec.base,mult:rec.base,level:1,feedCount:0,sellValue:500000,isUltra:true}; pets.push(newPet); equippedPet=newPet.id; buySound(); render(); startHatchAnimation(newPet,'ultra'); }
+$('clickBtn').addEventListener('click',()=>{initA();pop();startMusicOnFirstClick(); totalClicks++;coins+=getTotalMult(); if(isCyberEvent){ eventProgress++; if(eventProgress>=100){ eventProgress=0; cyberPoints++; buySound(); } } $('clickBtn').style.transform='scale(0.92)';setTimeout(()=>$('clickBtn').style.transform='scale(1)',80);render();if(totalClicks%50==0) checkGlobalRanking();});
+setInterval(()=>{ let cps=getCursorCPS(); if(cps>0){ let gain=cps*getTotalMult(); coins+=gain; totalClicks+=cps; if(isCyberEvent){ eventProgress+=cps; while(eventProgress>=100){ eventProgress-=100; cyberPoints++; } } render(); } },1000);
+setInterval(()=>{save();},2000); render(); setInterval(()=>{ render(); },1000);
+</script>
+</body>
+</html>
